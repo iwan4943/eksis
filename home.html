@@ -3,141 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#FFDBC8">
-    <meta name="description" content="Aplikasi Berakhlak Cerdas Berprestasi">
+    <meta name="theme-color" content="#FF9000">
+    <meta name="description" content="Portal Aplikasi SD Negeri 3 Krisak">
     
     <link rel="icon" type="image/png" href="https://i.imgur.com/NIlN3oW.png">
     <link rel="apple-touch-icon" href="https://i.imgur.com/NIlN3oW.png">
 
     <title>Sakti App - Berakhlak Cerdas Berprestasi</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
-    
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                    },
                     colors: {
-                        primary: '#9A4500',
-                        onPrimary: '#FFFFFF',
-                        primaryContainer: '#FFDBC8',
-                        onPrimaryContainer: '#321200',
-                        surface: '#FFF8F6',
-                        surfaceVariant: '#F5DED8',
-                        outline: '#85736E',
-                        secondary: '#77574E',
+                        primary: '#FF9000', 
+                        primaryDark: '#e65100',
+                        secondary: '#334155',
+                        surface: '#fdfbf7',
+                        surfaceCard: '#ffffff',
                     },
-                    borderRadius: {
-                        '4xl': '32px',
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
                     },
                     boxShadow: {
+                        'glow': '0 0 20px rgba(255, 144, 0, 0.3)',
+                        'card': '0 10px 30px -10px rgba(0,0,0,0.05)',
                         'soft': '0 4px 20px -2px rgba(154, 69, 0, 0.1)',
                     }
                 }
             }
         }
     </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body {
-            background-color: #FFF8F6;
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { background-color: #fdfbf7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .app-card {
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-        }
-        .app-card:active {
-            transform: scale(0.96);
-            box-shadow: none;
-        }
-
-        .ripple { position: relative; overflow: hidden; }
-        .ripple::after {
+        .ripple { position: relative; overflow: hidden; transform: translate3d(0, 0, 0); }
+        .ripple:after {
             content: ""; display: block; position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;
             background-image: radial-gradient(circle, #000 10%, transparent 10.01%);
             background-repeat: no-repeat; background-position: 50%; transform: scale(10, 10); opacity: 0; transition: transform .5s, opacity 1s;
         }
-        .ripple:active::after { transform: scale(0, 0); opacity: 0.1; transition: 0s; }
+        .ripple:active:after { transform: scale(0, 0); opacity: 0.1; transition: 0s; }
+        
+        /* Staggered Animation Delay */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
     </style>
 </head>
-<body class="text-onPrimaryContainer min-h-screen flex flex-col relative overflow-hidden">
+<body class="text-slate-800 min-h-screen relative overflow-x-hidden">
 
-    <div class="fixed top-[-100px] left-[-100px] w-80 h-80 bg-primaryContainer rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
-    <div class="fixed bottom-[-50px] right-[-50px] w-64 h-64 bg-orange-200 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+    <div class="fixed top-[-100px] left-[-100px] w-80 h-80 bg-orange-100/50 rounded-full blur-3xl opacity-60 z-0 pointer-events-none"></div>
+    <div class="fixed bottom-[-50px] right-[-50px] w-64 h-64 bg-yellow-100/50 rounded-full blur-3xl opacity-60 z-0 pointer-events-none"></div>
 
-    <main class="flex-grow flex flex-col px-6 py-6 z-10 max-w-md mx-auto w-full h-full">
+    <main class="relative z-10 max-w-md mx-auto min-h-screen px-6 py-8 flex flex-col">
         
-        <header class="flex items-center gap-4 mb-8 mt-4">
-            <div class="w-16 h-16 rounded-2xl bg-white p-2 shadow-soft border border-orange-100 flex items-center justify-center shrink-0">
-                <img src="https://i.imgur.com/NIlN3oW.png" alt="Logo" class="w-full h-full object-contain">
+        <header class="flex items-center gap-5 mb-10 fade-in">
+            <div class="w-20 h-20 rounded-[1.5rem] bg-white p-2 shadow-soft border border-orange-100 flex items-center justify-center shrink-0">
+                <img src="https://i.imgur.com/NIlN3oW.png" alt="Logo" class="w-full h-full object-contain drop-shadow-sm">
             </div>
             <div>
-                <h1 class="text-3xl font-bold text-gray-800 leading-tight">Sakti App</h1>
-                <p class="text-secondary text-sm font-medium">Berakhlak Cerdas Berprestasi</p>
+                <h1 class="text-3xl font-black text-slate-800 leading-none mb-1 tracking-tight">Sakti App</h1>
+                <p class="text-slate-400 text-sm font-bold tracking-wide">SD Negeri 3 Krisak</p>
+                <div class="inline-block mt-2 px-3 py-1 bg-orange-50 rounded-full border border-orange-100">
+                    <p class="text-[10px] font-extrabold text-primary uppercase tracking-wider">Berakhlak Cerdas Berprestasi</p>
+                </div>
             </div>
         </header>
 
-        <div class="space-y-5 flex-grow">
-            <a href="https://iwan4943.github.io/eksis/index.html" class="block">
-                <div class="app-card ripple bg-[#FFF4DE] p-6 rounded-4xl relative overflow-hidden group border border-orange-100/50 shadow-soft">
-                    <div class="absolute top-4 right-4 w-12 h-12 bg-[#FFD180] rounded-full flex items-center justify-center text-[#5D4037]">
-                        <span class="material-symbols-rounded text-2xl">sentiment_satisfied</span>
+        <div class="fade-in delay-100 mb-8">
+            <div class="bg-gradient-to-br from-primary to-primaryDark rounded-[2rem] p-6 text-white shadow-xl shadow-orange-200 relative overflow-hidden group">
+                <div class="absolute right-[-20px] top-[-20px] w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition duration-700"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-2 mb-2 text-orange-100">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span class="text-xs font-bold uppercase tracking-widest">Portal Digital</span>
                     </div>
-                    <div class="mt-8 relative z-10">
-                        <div class="w-12 h-12 mb-3 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                            <span class="material-symbols-rounded text-3xl text-orange-600">face</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-1">EKSIS</h3>
-                        <p class="text-gray-600 text-sm font-medium leading-relaxed">Emoji Kepuasan Siswa<br>& Kebiasaan Baik</p>
+                    <h2 class="text-2xl font-bold leading-tight mb-2">Selamat Datang, Bapak/Ibu Guru</h2>
+                    <p class="text-orange-50 text-sm font-medium">Silakan pilih aplikasi di bawah ini untuk memulai aktivitas.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4 flex-grow">
+            <div class="flex items-center gap-2 mb-2 px-1 fade-in delay-200">
+                <i data-lucide="layout-grid" class="w-4 h-4 text-primary"></i>
+                <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Daftar Aplikasi</span>
+            </div>
+
+            <a href="https://iwan4943.github.io/eksis/index.html" class="block fade-in delay-200">
+                <div class="ripple bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-5 group relative overflow-hidden">
+                    <div class="w-16 h-16 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center border border-yellow-100 group-hover:bg-yellow-100 transition shadow-sm z-10">
+                        <i data-lucide="smile-plus" class="w-8 h-8"></i>
                     </div>
-                    <div class="absolute -bottom-8 -right-8 w-32 h-32 bg-[#FFE0B2] rounded-full opacity-50 group-active:scale-150 transition-transform duration-500"></div>
+                    <div class="z-10 flex-grow">
+                        <h3 class="text-lg font-bold text-slate-800 group-hover:text-primary transition">EKSIS</h3>
+                        <p class="text-xs text-slate-400 font-medium leading-relaxed">Emoji Kepuasan Siswa<br>& Kebiasaan Baik</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 z-10">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </div>
+                    <div class="absolute -bottom-8 -right-8 w-24 h-24 bg-yellow-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-500 blur-xl"></div>
                 </div>
             </a>
 
-            <a href="https://onelabszz.github.io/jurnalgtk/phone.html" class="block">
-                <div class="app-card ripple bg-[#FFDBCC] p-6 rounded-4xl relative overflow-hidden group border border-orange-100/50 shadow-soft">
-                    <div class="absolute top-4 right-4 w-12 h-12 bg-[#FFAB91] rounded-full flex items-center justify-center text-[#3E2723]">
-                        <span class="material-symbols-rounded text-2xl">edit_document</span>
+            <a href="https://onelabszz.github.io/jurnalgtk/phone.html" class="block fade-in delay-300">
+                <div class="ripple bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-5 group relative overflow-hidden">
+                    <div class="w-16 h-16 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center border border-red-100 group-hover:bg-red-100 transition shadow-sm z-10">
+                        <i data-lucide="book-open-check" class="w-8 h-8"></i>
                     </div>
-                    <div class="mt-8 relative z-10">
-                        <div class="w-12 h-12 mb-3 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                            <span class="material-symbols-rounded text-3xl text-red-600">menu_book</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-1">Jurnal GTK</h3>
-                        <p class="text-gray-600 text-sm font-medium leading-relaxed">Laporan Kinerja Guru<br>& Monitoring KS</p>
+                    <div class="z-10 flex-grow">
+                        <h3 class="text-lg font-bold text-slate-800 group-hover:text-primary transition">Jurnal GTK</h3>
+                        <p class="text-xs text-slate-400 font-medium leading-relaxed">Laporan Kinerja Guru<br>& Monitoring KS</p>
                     </div>
-                    <div class="absolute -bottom-8 -right-8 w-32 h-32 bg-[#FFCCBC] rounded-full opacity-50 group-active:scale-150 transition-transform duration-500"></div>
+                    <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 z-10">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </div>
+                    <div class="absolute -bottom-8 -right-8 w-24 h-24 bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-500 blur-xl"></div>
                 </div>
             </a>
         </div>
 
-        <div class="mt-6 mb-2">
-            <a href="https://iwan4943.github.io/eksis/landing.html" class="ripple flex items-center justify-between bg-white/60 backdrop-blur-md border border-orange-200 p-4 rounded-3xl active:scale-95 transition-transform shadow-sm">
+        <div class="mt-8 fade-in delay-300">
+            <a href="https://iwan4943.github.io/eksis/landing.html" class="ripple flex items-center justify-between bg-white/60 backdrop-blur-md border border-slate-200 p-4 rounded-3xl active:scale-95 transition-transform shadow-sm mb-6 group hover:bg-white">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-primary">
-                        <span class="material-symbols-rounded">info</span>
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center border border-blue-100">
+                        <i data-lucide="info" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-bold text-gray-800">Tentang Aplikasi</p>
-                        <p class="text-xs text-secondary">Panduan & Informasi Lengkap</p>
+                        <p class="text-sm font-bold text-slate-800 group-hover:text-primary transition">Tentang Aplikasi</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Panduan & Informasi</p>
                     </div>
                 </div>
-                <span class="material-symbols-rounded text-orange-300">chevron_right</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-slate-300"></i>
             </a>
+
+            <footer class="text-center pb-4">
+                <div class="flex justify-center items-center gap-1 mb-2 opacity-30">
+                     <i data-lucide="command" class="w-3 h-3"></i>
+                </div>
+                <p class="text-slate-400 text-[10px] font-bold tracking-widest uppercase opacity-60">
+                    &copy; 2026 Aplikasi SD Negeri 3 Krisak
+                </p>
+            </footer>
         </div>
 
-        <footer class="mt-4 mb-4 text-center">
-            <p class="text-orange-900/40 text-xs font-medium tracking-wide">2026 | Aplikasi SD Negeri 3 Krisak</p>
-        </footer>
-
     </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>
