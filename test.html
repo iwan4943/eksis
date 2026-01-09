@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EKSIS 2026 - Sistem Monitoring Siswa</title>
+    
+    <!-- Tailwind CSS (Styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Inter (Official Look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Import Map for Gemini API -->
+    <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.run/@google/genai",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "recharts": "https://esm.sh/recharts@^3.6.0"
+  }
+}
+</script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        official: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb', // Dinas Blue
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #f1f5f9; }
+        .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card-official { border: 1px solid #e2e8f0; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .btn-primary { background-color: #1e40af; color: white; transition: 0.2s; }
+        .btn-primary:active { background-color: #1e3a8a; transform: scale(0.98); }
+        .btn-outline { border: 1px solid #e2e8f0; background: white; color: #475569; }
+        .btn-outline:active { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<div id="app" class="app-container flex flex-col">
+    <!-- Content will be injected here by JS -->
+</div>
+
+<script type="module">
+    import { GoogleGenAI } from "@google/genai";
+
+    // --- 1. DATA & STATE MANAGEMENT ---
+
+    const STORAGE_KEY = 'eksis_official_v1';
+    
+    // Initial Data Mock
+    const INITIAL_DB = {
+        users: [
+            { username: 'admin', nama: 'Administrator', role: 'Admin' },
+            { username: 'guru1', nama: 'Budi Santoso, S.Pd', role: 'Guru Kelas', kelas: '1A' },
+            { username: 'guru2', nama: 'Siti Aminah, M.Pd', role: 'Guru Mapel', mapel: 'PJOK' },
+        ],
+        students: [
+            { id: 's1', nis: '1001', nama: 'Ahmad Dahlan', gender: 'L', kelas: '1A' },
+            { id: 's2', nis: '1002', nama: 'Bunga Citra', gender: 'P', kelas: '1A' },
+            { id: 's3', nis: '1003', nama: 'Candra Wijaya', gender: 'L', kelas: '1A' },
+            { id: 's4', nis: '1004', nama: 'Dewi Sartika', gender: 'P', kelas: '1A' },
+            { id: 's5', nis: '1005', nama: 'Eko Patrio', gender: 'L', kelas: '1A' },
+        ],
+        moodLogs: [],
+        kaihLogs: []
+    };
+
+    // State
+    let state = {
+        currentUser: null,
+        currentView: 'login', // login, dashboard, survey, kaih, rekap
+        selectedClass: '',
+        surveyIndex: 0,
+        tempSurveyData: {}, // { absen, emoji, note }
+        kaihIndex: 0,
+        tempKaihData: {}, // { h1: true, h2: false... }
+        isLoading: false
+    };
+
+    // --- 2. SERVICES ---
+
+    const DB = {
+        load: () => {
+            const s = localStorage.getItem(STORAGE_KEY);
+            return s ? JSON.parse(s) : INITIAL_DB;
+        },
+        save: (data) => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        },
+        addMood: (log) => {
+            const data = DB.load();
+            // Remove dupe for same day/student
+            data.moodLogs = data.moodLogs.filter(l => !(l.studentId === log.studentId && l.date === log.date));
+            data.moodLogs.push({ ...log, id: Date.now().toString() });
+            DB.save(data);
+        },
+        addKaih: (log) => {
+            const data = DB.load();
+            data.kaihLogs = data.kaihLogs.filter(l => !(l.studentId === log.studentId && l.date === log.date));
+            data.kaihLogs.push({ ...log, id: Date.now().toString() });
+            DB.save(data);
+        },
+        getStats: (kelas) => {
+            const data = DB.load();
+            const today = new Date().toISOString().split('T')[0];
+            const logs = data.moodLogs.filter(l => l.kelas === kelas && l.date === today);
+            return {
+                senang: logs.filter(l => l.emoji === 'Sangat Senang').length,
+                paham: logs.filter(l => l.emoji === 'Paham').length,
+                biasa: logs.filter(l => l.emoji === 'Biasa Saja').length,
+                sedih: logs.filter(l => l.emoji === 'Bingung/Sedih').length,
+                hadir: logs.filter(l => l.absen === 'Hadir').length,
+                sakit: logs.filter(l => l.absen === 'Sakit').length,
+                izin: logs.filter(l => l.absen === 'Izin').length,
+                alpha: logs.filter(l => l.absen === 'Alpha').length,
+                total: logs.length
+            };
+        }
+    };
+
+    // Gemini Service
+    const analyzeWithGemini = async (kelas, stats) => {
+        // NOTE: process.env.API_KEY is replaced by the environment running this code.
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY }); 
+        
+        const prompt = `
+            Bertindaklah sebagai Konsultan Psikologi Pendidikan Sekolah Dasar.
+            Analisis data kelas ${kelas} hari ini:
+            - Sangat Senang: ${stats.senang}
+            - Paham: ${stats.paham}
+            - Biasa Saja: ${stats.biasa}
+            - Sedih/Bingung: ${stats.sedih}
+            - Kehadiran: Sakit (${stats.sakit}), Izin (${stats.izin}), Alpha (${stats.alpha}).
+            
+            Berikan output JSON:
+            {
+                "analysis": "Kalimat analisis singkat (max 30 kata) tentang suasana kelas.",
+                "recommendations": ["Saran 1 (singkat)", "Saran 2 (singkat)", "Saran 3 (singkat)"]
+            }
+        `;
+
+        try {
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-flash-preview',
+                contents: prompt,
+                config: { responseMimeType: "application/json" }
+            });
+            return JSON.parse(response.text);
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    };
+
+    // --- 3. UI RENDERING LOGIC ---
+
+    const app = document.getElementById('app');
+
+    function render() {
+        app.innerHTML = '';
+        
+        switch(state.currentView) {
+            case 'login': renderLogin(); break;
+            case 'dashboard': renderDashboard(); break;
+            case 'survey': renderSurvey(); break;
+            case 'kaih': renderKaih(); break;
+            case 'rekap': renderRekap(); break;
+        }
+        lucide.createIcons();
+    }
+
+    function renderLogin() {
+        app.innerHTML = `
+            <div class="flex-1 flex flex-col justify-center p-8 bg-official-50">
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-official-100 fade-in">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-official-600 rounded-lg mx-auto flex items-center justify-center mb-4 shadow-lg shadow-blue-900/20">
+                            <i data-lucide="graduation-cap" class="text-white w-8 h-8"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-slate-800">EKSIS 2026</h1>
+                        <p class="text-sm text-slate-500 font-medium">Sistem Monitoring Siswa Terpadu</p>
+                    </div>
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username / NIP</label>
+                            <input type="text" id="username" class="w-full p-3 rounded-lg border border-slate-300 focus:border-official-600 outline-none transition-colors" placeholder="Masukkan username">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
+                            <input type="password" value="demo" class="w-full p-3 rounded-lg border border-slate-300 focus:border-official-600 outline-none transition-colors" placeholder="Masukkan password">
+                        </div>
+                        <button type="submit" class="w-full btn-primary py-3 rounded-lg font-bold shadow-md">
+                            MASUK APLIKASI
+                        </button>
+                    </form>
+                    <div class="mt-6 text-center text-xs text-slate-400">
+                        &copy; 2026 Dinas Pendidikan Kota
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const db = DB.load();
+            const user = db.users.find(x => x.username === u);
+            if (user) {
+                state.currentUser = user;
+                state.selectedClass = user.kelas || '';
+                state.currentView = 'dashboard';
+                render();
+            } else {
+                alert('User tidak ditemukan (Coba: guru1)');
+            }
+        };
+    }
+
+    function renderDashboard() {
+        const u = state.currentUser;
+        app.innerHTML = `
+            <!-- Header -->
+            <div class="bg-official-800 text-white p-6 rounded-b-3xl shadow-lg relative z-10">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-official-100 text-xs font-semibold uppercase tracking-wider mb-1">Selamat Datang,</p>
+                        <h2 class="text-xl font-bold">${u.nama}</h2>
+                        <span class="inline-block mt-2 px-3 py-1 bg-official-700 rounded-full text-xs font-medium border border-official-600">${u.role} ${u.kelas ? '- ' + u.kelas : ''}</span>
+                    </div>
+                    <button id="logoutBtn" class="bg-official-700 p-2 rounded-lg text-white hover:bg-official-600 transition">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-5 space-y-4 -mt-4 relative z-0 fade-in">
+                
+                <!-- Info Card -->
+                <div class="card-official p-4 flex items-center justify-between bg-yellow-50 border-yellow-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-yellow-100 rounded-lg text-yellow-700">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Status Laporan</h3>
+                            <p class="text-xs text-slate-500">Data hari ini belum lengkap.</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold text-yellow-700">Cek</span>
+                </div>
+
+                <!-- Menu Grid -->
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-4">Menu Utama</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    
+                    <button onclick="window.navigate('survey')" class="card-official p-4 flex items-center gap-4 hover:bg-official-50 transition text-left group">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 text-green-700 flex items-center justify-center group-hover:bg-green-200 transition">
+                            <i data-lucide="smile" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800">Survey Karakter</div>
+                            <div class="text-xs text-slate-500">Input mood & absensi siswa</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 ml-auto"></i>
+                    </button>
+
+                    ${u.role === 'Guru Kelas' ? `
+                    <button onclick="window.navigate('kaih')" class="card-official p-4 flex items-center gap-4 hover:bg-official-50 transition text-left group">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center group-hover:bg-indigo-200 transition">
+                            <i data-lucide="check-square" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800">KAIH (7 Habits)</div>
+                            <div class="text-xs text-slate-500">Checklist kebiasaan harian</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 ml-auto"></i>
+                    </button>
+                    ` : ''}
+
+                    <button onclick="window.navigate('rekap')" class="card-official p-4 flex items-center gap-4 hover:bg-official-50 transition text-left group">
+                        <div class="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center group-hover:bg-blue-200 transition">
+                            <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800">Rekap & Analisis</div>
+                            <div class="text-xs text-slate-500">Laporan data & AI Insight</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300 ml-auto"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('logoutBtn').onclick = () => {
+            state.currentUser = null;
+            state.currentView = 'login';
+            render();
+        };
+
+        window.navigate = (view) => {
+            state.currentView = view;
+            render();
+        };
+    }
+
+    function renderSurvey() {
+        const db = DB.load();
+        // If not Guru Kelas, maybe select class logic here (simplified for demo to 1A)
+        const students = db.students.filter(s => s.kelas === (state.selectedClass || '1A'));
+        
+        if (state.surveyIndex >= students.length) {
+            alert('Survey selesai!');
+            state.surveyIndex = 0;
+            state.currentView = 'dashboard';
+            render();
+            return;
+        }
+
+        const student = students[state.surveyIndex];
+        const data = state.tempSurveyData; // { absen, emoji }
+        const currentAbsen = data.absen || 'Hadir';
+
+        app.innerHTML = `
+            <div class="p-4 bg-white border-b border-slate-100 flex items-center gap-3 sticky top-0 z-20">
+                <button onclick="window.backToDash()" class="p-2 -ml-2 text-slate-600"><i data-lucide="arrow-left"></i></button>
+                <div>
+                    <h2 class="font-bold text-slate-800 text-lg">Survey Siswa</h2>
+                    <p class="text-xs text-slate-500">Kelas ${student.kelas}</p>
+                </div>
+                <div class="ml-auto bg-slate-100 px-3 py-1 rounded-full text-xs font-bold text-slate-600">
+                    ${state.surveyIndex + 1}/${students.length}
+                </div>
+            </div>
+
+            <div class="p-5 flex-1 flex flex-col fade-in">
+                <div class="text-center mb-6 mt-2">
+                    <div class="w-20 h-20 bg-official-50 rounded-full mx-auto flex items-center justify-center border-2 border-official-100 mb-3 text-2xl font-bold text-official-600 shadow-sm">
+                        ${student.nama.charAt(0)}
+                    </div>
+                    <h1 class="text-2xl font-bold text-slate-800">${student.nama}</h1>
+                    <p class="text-sm text-slate-400 font-medium">${student.nis} • ${student.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Absensi -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2 text-center">Kehadiran</label>
+                        <div class="flex bg-slate-50 p-1 rounded-xl border border-slate-200">
+                            ${['Hadir', 'Sakit', 'Izin', 'Alpha'].map(status => `
+                                <button onclick="window.setAbsen('${status}')" 
+                                    class="flex-1 py-2 rounded-lg text-xs font-bold transition-all ${currentAbsen === status ? 
+                                    (status==='Hadir'?'bg-slate-800 text-white shadow': 
+                                     status==='Sakit'?'bg-orange-500 text-white shadow':
+                                     status==='Izin'?'bg-blue-500 text-white shadow':
+                                     'bg-red-500 text-white shadow') : 'text-slate-500 hover:bg-white'}">
+                                    ${status}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Mood Grid (Only if Hadir) -->
+                    ${currentAbsen === 'Hadir' ? `
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2 text-center">Mood Siswa</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="window.saveSurvey('Sangat Senang')" class="p-4 border border-green-200 bg-green-50 rounded-xl flex flex-col items-center gap-2 hover:bg-green-100 transition active:scale-95">
+                                <span class="text-4xl">🤩</span>
+                                <span class="text-xs font-bold text-green-800 uppercase">Sangat Senang</span>
+                            </button>
+                            <button onclick="window.saveSurvey('Paham')" class="p-4 border border-blue-200 bg-blue-50 rounded-xl flex flex-col items-center gap-2 hover:bg-blue-100 transition active:scale-95">
+                                <span class="text-4xl">😊</span>
+                                <span class="text-xs font-bold text-blue-800 uppercase">Paham</span>
+                            </button>
+                            <button onclick="window.saveSurvey('Biasa Saja')" class="p-4 border border-amber-200 bg-amber-50 rounded-xl flex flex-col items-center gap-2 hover:bg-amber-100 transition active:scale-95">
+                                <span class="text-4xl">😐</span>
+                                <span class="text-xs font-bold text-amber-800 uppercase">Biasa Saja</span>
+                            </button>
+                            <button onclick="window.saveSurvey('Bingung/Sedih')" class="p-4 border border-red-200 bg-red-50 rounded-xl flex flex-col items-center gap-2 hover:bg-red-100 transition active:scale-95">
+                                <span class="text-4xl">😢</span>
+                                <span class="text-xs font-bold text-red-800 uppercase">Bingung</span>
+                            </button>
+                        </div>
+                    </div>
+                    ` : `
+                    <button onclick="window.saveSurvey(null)" class="w-full btn-outline py-4 rounded-xl font-bold border-2 border-slate-300 text-slate-500">
+                        Simpan Absensi & Lanjut
+                    </button>
+                    `}
+                </div>
+            </div>
+        `;
+
+        window.backToDash = () => { state.currentView = 'dashboard'; render(); };
+        window.setAbsen = (val) => { state.tempSurveyData.absen = val; render(); };
+        window.saveSurvey = (emoji) => {
+            DB.addMood({
+                studentId: student.id,
+                studentName: student.nama,
+                date: new Date().toISOString().split('T')[0],
+                emoji: emoji || 'Biasa Saja',
+                absen: state.tempSurveyData.absen || 'Hadir',
+                guru: state.currentUser.nama,
+                kelas: student.kelas
+            });
+            // Reset & Next
+            state.tempSurveyData = {};
+            state.surveyIndex++;
+            render();
+        };
+    }
+
+    function renderKaih() {
+        const db = DB.load();
+        const students = db.students.filter(s => s.kelas === (state.selectedClass || '1A'));
+        
+        if (state.kaihIndex >= students.length) {
+            alert('Checklist KAIH selesai!');
+            state.kaihIndex = 0;
+            state.currentView = 'dashboard';
+            render();
+            return;
+        }
+
+        const student = students[state.kaihIndex];
+        const habits = [
+            'Bangun Pagi', 'Beribadah', 'Berolahraga', 'Makan Sehat', 
+            'Gemar Belajar', 'Bermasyarakat', 'Tidur Cepat'
+        ];
+
+        app.innerHTML = `
+             <div class="p-4 bg-white border-b border-slate-100 flex items-center gap-3 sticky top-0 z-20">
+                <button onclick="window.backToDash()" class="p-2 -ml-2 text-slate-600"><i data-lucide="arrow-left"></i></button>
+                <div>
+                    <h2 class="font-bold text-slate-800 text-lg">Checklist KAIH</h2>
+                    <p class="text-xs text-slate-500">7 Kebiasaan Anak Indonesia Hebat</p>
+                </div>
+            </div>
+            
+            <div class="p-5 pb-24 fade-in">
+                <div class="card-official p-4 mb-4 bg-indigo-50 border-indigo-100 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-indigo-900">${student.nama}</h3>
+                        <p class="text-xs text-indigo-500">Siswa ke-${state.kaihIndex + 1}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    ${habits.map((h, i) => {
+                        const id = 'h'+(i+1);
+                        const val = state.tempKaihData[id];
+                        return `
+                        <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold">${i+1}</div>
+                                <span class="text-sm font-medium text-slate-700">${h}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.setKaih('${id}', true)" class="w-10 h-10 rounded-lg border flex items-center justify-center transition ${val===true ? 'bg-green-600 text-white border-green-600':'bg-white text-slate-300 border-slate-200'}">
+                                    <i data-lucide="check" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="window.setKaih('${id}', false)" class="w-10 h-10 rounded-lg border flex items-center justify-center transition ${val===false ? 'bg-red-500 text-white border-red-500':'bg-white text-slate-300 border-slate-200'}">
+                                    <i data-lucide="x" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            <div class="fixed bottom-0 left-0 w-full p-4 bg-white border-t border-slate-200 max-w-[480px] mx-auto">
+                <button onclick="window.saveKaih()" class="w-full btn-primary py-3 rounded-lg font-bold shadow-lg">
+                    SIMPAN & LANJUT
+                </button>
+            </div>
+        `;
+        
+        window.backToDash = () => { state.currentView = 'dashboard'; render(); };
+        window.setKaih = (id, val) => {
+            if (!state.tempKaihData) state.tempKaihData = {};
+            state.tempKaihData[id] = val;
+            render();
+        };
+        window.saveKaih = () => {
+            const log = {
+                studentId: student.id,
+                date: new Date().toISOString().split('T')[0],
+                ...state.tempKaihData
+            };
+            DB.addKaih(log);
+            state.tempKaihData = {};
+            state.kaihIndex++;
+            render();
+        };
+    }
+
+    function renderRekap() {
+        const stats = DB.getStats(state.selectedClass || '1A');
+        
+        app.innerHTML = `
+            <div class="p-4 bg-white border-b border-slate-100 flex items-center gap-3 sticky top-0 z-20">
+                <button onclick="window.backToDash()" class="p-2 -ml-2 text-slate-600"><i data-lucide="arrow-left"></i></button>
+                <div>
+                    <h2 class="font-bold text-slate-800 text-lg">Rekapitulasi</h2>
+                    <p class="text-xs text-slate-500">Analisis Data Harian</p>
+                </div>
+            </div>
+
+            <div class="p-5 space-y-6 fade-in pb-20">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="card-official p-4 border-l-4 border-l-green-500">
+                        <div class="text-xs text-slate-400 font-bold uppercase">Sangat Senang</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">${stats.senang} <span class="text-xs font-normal text-slate-400">siswa</span></div>
+                    </div>
+                    <div class="card-official p-4 border-l-4 border-l-blue-500">
+                        <div class="text-xs text-slate-400 font-bold uppercase">Paham</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">${stats.paham} <span class="text-xs font-normal text-slate-400">siswa</span></div>
+                    </div>
+                    <div class="card-official p-4 border-l-4 border-l-amber-500">
+                        <div class="text-xs text-slate-400 font-bold uppercase">Biasa Saja</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">${stats.biasa} <span class="text-xs font-normal text-slate-400">siswa</span></div>
+                    </div>
+                    <div class="card-official p-4 border-l-4 border-l-red-500">
+                        <div class="text-xs text-slate-400 font-bold uppercase">Sedih/Bingung</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">${stats.sedih} <span class="text-xs font-normal text-slate-400">siswa</span></div>
+                    </div>
+                </div>
+
+                <!-- Simple Bar Chart -->
+                <div class="card-official p-5">
+                    <h3 class="font-bold text-slate-800 mb-4 text-sm">Grafik Mood Kelas</h3>
+                    <div class="flex items-end justify-between h-32 gap-2 text-center pb-2 border-b border-slate-100">
+                        <div class="w-full flex flex-col justify-end items-center gap-1 group">
+                            <div class="w-full bg-green-400 rounded-t-sm transition-all group-hover:bg-green-500" style="height: ${Math.max(5, (stats.senang/stats.total)*100 || 0)}%"></div>
+                            <span class="text-[10px] font-bold text-slate-500">Senang</span>
+                        </div>
+                         <div class="w-full flex flex-col justify-end items-center gap-1 group">
+                            <div class="w-full bg-blue-400 rounded-t-sm transition-all group-hover:bg-blue-500" style="height: ${Math.max(5, (stats.paham/stats.total)*100 || 0)}%"></div>
+                            <span class="text-[10px] font-bold text-slate-500">Paham</span>
+                        </div>
+                         <div class="w-full flex flex-col justify-end items-center gap-1 group">
+                            <div class="w-full bg-amber-400 rounded-t-sm transition-all group-hover:bg-amber-500" style="height: ${Math.max(5, (stats.biasa/stats.total)*100 || 0)}%"></div>
+                            <span class="text-[10px] font-bold text-slate-500">Biasa</span>
+                        </div>
+                         <div class="w-full flex flex-col justify-end items-center gap-1 group">
+                            <div class="w-full bg-red-400 rounded-t-sm transition-all group-hover:bg-red-500" style="height: ${Math.max(5, (stats.sedih/stats.total)*100 || 0)}%"></div>
+                            <span class="text-[10px] font-bold text-slate-500">Sedih</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs mt-3 text-slate-500 font-medium">
+                        <span>Hadir: ${stats.hadir}</span>
+                        <span>Sakit: ${stats.sakit}</span>
+                        <span>Izin: ${stats.izin}</span>
+                        <span>Alpha: ${stats.alpha}</span>
+                    </div>
+                </div>
+
+                <!-- AI Section -->
+                <div id="ai-section">
+                    <button onclick="window.triggerAI()" class="w-full py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 transition hover:shadow-xl">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        <span class="font-bold">Minta Analisis AI (Gemini)</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        window.backToDash = () => { state.currentView = 'dashboard'; render(); };
+        window.triggerAI = async () => {
+            const btn = document.querySelector('#ai-section button');
+            const container = document.getElementById('ai-section');
+            
+            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Menganalisis...`;
+            btn.disabled = true;
+
+            const result = await analyzeWithGemini(state.selectedClass || '1A', stats);
+            
+            if (result) {
+                container.innerHTML = `
+                    <div class="card-official bg-white overflow-hidden border-violet-100">
+                        <div class="bg-violet-50 p-3 border-b border-violet-100 flex items-center gap-2">
+                             <i data-lucide="brain-circuit" class="text-violet-600 w-5 h-5"></i>
+                             <h3 class="font-bold text-violet-800 text-sm">Analisis Psikologis AI</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <p class="text-sm text-slate-700 leading-relaxed italic">"${result.analysis}"</p>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Rekomendasi Tindakan:</h4>
+                                <ul class="space-y-2">
+                                    ${result.recommendations.map(r => `
+                                        <li class="flex gap-2 text-sm text-slate-700">
+                                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500 shrink-0 mt-0.5"></i>
+                                            ${r}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            } else {
+                btn.innerHTML = `Gagal. Coba Lagi`;
+                btn.disabled = false;
+            }
+        };
+    }
+
+    // Init
+    render();
+
+</script>
+</body>
+</html>
