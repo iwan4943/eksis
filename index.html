@@ -1,529 +1,994 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EKSIS 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <title>EKSIS 2026 - Emoji Kepuasan Siswa</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF9000', 
+                        primaryDark: '#e65100',
+                        secondary: '#334155',
+                        surface: '#fdfbf7',
+                        surfaceCard: '#ffffff',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(255, 144, 0, 0.3)',
+                        'card': '0 10px 30px -10px rgba(0,0,0,0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-      /* --- UI STYLE: EKSIS 2026 GLASSMORPHISM --- */
-      :root {
-        --primary: #FFB300; 
-        --primary-grad: linear-gradient(135deg, #FFB300 0%, #FF8F00 100%);
-        --secondary: #1976D2; 
-        --bg: #E5E9F0; 
-        --text: #212121; 
-        --male: #1565C0; --female: #C2185B;
-        --gold-grad: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
-        --blue-grad: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-        --yes: #2E7D32; --no: #D84315; 
-        --float-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.1);
-        --pressed-shadow: inset 0 5px 10px rgba(0,0,0,0.2);
-        --card-border: 1px solid rgba(0,0,0,0.08); 
-        --elem-border: 1px solid #CFD8DC;
-      }
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-      body { font-family: 'Fredoka', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
-      .hide { display: none !important; }
-      .fade-in { animation: fadeIn 0.4s ease-out; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes spin { 100% { transform: rotate(360deg); } }
-      .spin-active { animation: spin 0.8s linear infinite; color: var(--secondary) !important; }
-      @keyframes burst { 0% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.7); } 100% { box-shadow: 0 0 0 30px rgba(255, 179, 0, 0); } }
-      .anim-burst { animation: burst 0.4s ease-out; }
-      .app-header { background: var(--primary-grad); padding: 15px 20px; border-radius: 0 0 25px 25px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(255, 143, 0, 0.3); position: sticky; top: 0; z-index: 100; }
-      .profile-area { display: flex; align-items: center; gap: 12px; }
-      .profile-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); border: 2px solid rgba(255,255,255,0.3);}
-      .profile-icon i { font-size: 26px; color: white; }
-      .user-greet h2 { margin: 0; font-size: 18px; line-height: 1.2; font-weight: 700;} .user-greet p { margin: 0; font-size: 12px; opacity: 0.9; font-weight: 500;}
-      .btn-home-header { width: 40px; height: 40px; background: rgba(255,255,255,0.2); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.3); }
-      .btn-home-header:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
-      .content-area { padding: 20px; padding-bottom: 40px; }
-      .card { background: white; border-radius: 25px; padding: 25px 20px; margin-bottom: 25px; box-shadow: var(--float-shadow); border: var(--card-border); position: relative; z-index: 10; overflow: hidden; }
-      .reward-section-title { text-align: center; font-weight: 800; color: #F57C00; margin: 5px 0 15px 0; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px; }
-      .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-      .card-reward { border:var(--card-border); overflow: hidden; position: relative; padding: 15px; min-height: 110px; display: flex; flex-direction: column; justify-content: center; text-align: left; box-shadow: var(--float-shadow); border-radius: 20px; background: white; }
-      .cr-gold { background: var(--gold-grad); color: #3E2723; border-color: #FFD54F; }
-      .cr-blue { background: var(--blue-grad); color: #0D47A1; border-color: #90CAF9; }
-      .cr-lead-icon { font-size: 38px !important; color: rgba(0,0,0,0.6); margin-bottom: 0 !important; } 
-      .cr-name-box { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 5px; width: 100%; }
-      .cr-name-text { font-size: 15px; font-weight: 800; line-height: 1.2; text-align: left; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
-      .cr-title { font-size: 10px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; opacity: 0.7; margin-bottom: 2px; display: block;}
-      .cr-val { font-size: 11px; background: rgba(255,255,255,0.7); padding: 4px 10px; border-radius: 12px; font-weight: bold; display: inline-block; margin-top: 5px; width: fit-content; max-width: 90%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);}
-      .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 15px; }
-      .menu-item { display: flex; align-items: center; padding: 18px 20px; border-radius: 25px; transition: transform 0.2s; cursor: pointer; background: white; box-shadow: var(--float-shadow); border: var(--card-border); }
-      .menu-item:active { transform: translateY(4px); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
-      .menu-badge { width: 50px; height: 50px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin-right: 15px; background: #F5F7FA; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); border: var(--elem-border); }
-      .menu-badge i { font-size: 28px; }
-      .menu-label { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 2px; } 
-      .menu-desc { font-size: 12px; opacity: 0.7; font-weight: 600; color: #546E7A; }
-      .m-green .menu-badge i { color: #2E7D32; } .m-blue .menu-badge i { color: #1565C0; } .m-orange .menu-badge i { color: #EF6C00; } .m-red .menu-badge i { color: #C62828; } .m-purple .menu-badge i { color: #7B1FA2; }
-      .stat-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 5px;}
-      .stat-item { padding: 15px 5px; border-radius: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; color: var(--text); position:relative; background: white; box-shadow: var(--float-shadow); border: 1px solid #eee;}
-      .st-senang { background: #C8E6C9; color: #1B5E20; border-color: #81C784;} 
-      .st-paham { background: #BBDEFB; color: #0D47A1; border-color: #64B5F6;} 
-      .st-biasa { background: #FFECB3; color: #FF6F00; border-color: #FFD54F;} 
-      .st-sedih { background: #FFCDD2; color: #B71C1C; border-color: #E57373;}
-      .stat-num-small { font-size: 20px; font-weight: 800; display:block; margin-bottom: 2px;} 
-      .stat-lbl-small { font-size: 10px; opacity: 0.9; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-      .analysis-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--float-shadow); border-left: 6px solid #EF6C00; border: var(--card-border); }
-      .reco-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--float-shadow); border-left: 6px solid #7B1FA2; border: var(--card-border);}
-      .analysis-title { font-weight:800; color:#E65100; margin-bottom:10px; display:flex; align-items:center; gap:8px; font-size: 15px;}
-      .reco-title { font-weight:800; color:#4A148C; margin-bottom:10px; display:flex; align-items:center; gap:8px; font-size: 15px;}
-      .dashboard-card { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; box-shadow: var(--float-shadow); border: var(--card-border);}
-      .survey-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-      .survey-header span { flex-grow: 1; text-align: center; font-weight: 800; color: var(--text); font-size: 18px; }
-      .btn-back-modern { width: 45px; height: 45px; border-radius: 14px; border: 1px solid #eee; background: white; box-shadow: var(--float-shadow); display: flex; align-items: center; justify-content: center; color: #546E7A; cursor: pointer; flex-shrink: 0; transition:0.2s;}
-      .btn-back-modern:active { transform: scale(0.95); box-shadow: var(--pressed-shadow); background: #f5f5f5;}
-      .header-spacer { width: 45px; flex-shrink: 0; } 
-      .siswa-info { text-align: center; margin-bottom: 25px; margin-top: 5px; }
-      .siswa-nick { font-size: 46px; font-weight: 800; line-height: 1.1; margin-bottom: 5px; letter-spacing: -1px; text-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-      .text-l { color: var(--male); } .text-p { color: var(--female); }
-      .siswa-full { color: #546E7A; font-size: 14px; font-weight: 700; background: #F5F7FA; padding: 5px 15px; border-radius: 20px; display: inline-block; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); border: var(--elem-border);}
-      .absen-bar { display: flex; gap: 8px; margin-bottom: 25px; width: 100%; }
-      .chip { flex: 1; padding: 12px 5px; background: #F5F7FA; border: var(--elem-border); border-radius: 18px; font-size: 12px; color: #78909C; cursor: pointer; font-weight: 700; text-align: center; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s;}
-      .chip.active { background: #263238; color: white; border-color: #263238; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transform: translateY(-2px); }
-      .chip.active.s { background: #FF9800; border-color: #FF9800; } .chip.active.i { background: #2196F3; border-color: #2196F3; } .chip.active.a { background: #F44336; border-color: #F44336; }
-      .emoji-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-      .btn-emoji { background: white; border-radius: 30px; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid #f0f0f0; box-shadow: var(--float-shadow); transition: all 0.1s; }
-      .e-senang { background: #DCEDC8; border-color: #AED581; color: #33691E; } .e-paham { background: #BBDEFB; border-color: #64B5F6; color: #0D47A1; } .e-biasa { background: #FFECB3; border-color: #FFD54F; color: #FF6F00; } .e-sedih { background: #FFCDD2; border-color: #E57373; color: #B71C1C; }
-      .btn-emoji:active { transform: scale(0.96); box-shadow: var(--pressed-shadow); border-color: #ccc; }
-      .emoji-img { font-size: 75px; display: block; margin-bottom: 10px; filter: drop-shadow(0 8px 15px rgba(0,0,0,0.15)); transition: transform 0.2s; }
-      .btn-emoji:active .emoji-img { transform: scale(0.95); filter: none; }
-      .emoji-label { font-size: 16px; font-weight: 800; color: inherit; text-transform: uppercase; letter-spacing: 1px;}
-      .nav-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
-      .btn-nav-round { width: 60px; height: 60px; border-radius: 50%; border: 1px solid #eee; background: white; box-shadow: var(--float-shadow); color: #546E7A; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-      .btn-nav-round:active { transform: scale(0.95); box-shadow: var(--pressed-shadow); background: #f5f5f5;} .btn-nav-round i { font-size: 34px; }
-      .counter-badge { background: #F5F7FA; padding: 8px 20px; border-radius: 20px; font-size: 14px; color: var(--secondary); font-weight: 800; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); border: var(--elem-border);}
-      .kaih-list { display: flex; flex-direction: column; gap: 15px; } 
-      .kaih-item { display: flex; align-items: center; background: white; padding: 15px; border-radius: 20px; box-shadow: var(--float-shadow); transition: transform 0.2s; border: var(--card-border); }
-      .kaih-item:active { transform: translateY(2px); box-shadow: var(--pressed-shadow); }
-      .kaih-icon { width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
-      .kaih-content { flex: 1; } .kaih-title { font-weight: 700; color: var(--text); font-size: 15px; margin-bottom: 8px;}
-      .kaih-actions { display: flex; gap: 8px; }
-      .k-btn { flex: 1; padding: 10px; border-radius: 12px; border: var(--elem-border); background: #F5F7FA; color: #78909C; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-      .k-btn.active-yes { background: var(--yes); color: white; border-color: var(--yes); box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3); }
-      .k-btn.active-no { background: var(--no); color: white; border-color: var(--no); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.3); }
-      .kp-1 { background: #FFECB3; color: #FF6F00; } .kp-2 { background: #E1BEE7; color: #7B1FA2; } .kp-3 { background: #C8E6C9; color: #2E7D32; } .kp-4 { background: #FFCDD2; color: #C62828; } .kp-5 { background: #BBDEFB; color: #1565C0; } .kp-6 { background: #C5CAE9; color: #303F9F; } .kp-7 { background: #CFD8DC; color: #455A64; }
-      .kaih-row { margin-bottom: 12px; } .kaih-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; color: var(--text); font-weight: 700;} .progress-bg { height: 12px; background: #ECEFF1; border-radius: 6px; overflow: hidden; border: 1px solid #CFD8DC;} .progress-fill { height: 100%; background: var(--yes); border-radius: 5px; }
-      #view-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-grad); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-      .login-card { background: rgba(255,255,255,0.98); backdrop-filter: blur(15px); padding: 40px 30px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.5); }
-      .input-login { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #CFD8DC; border-radius: 15px; font-size: 16px; background: #F5F7FA; outline: none; color: var(--text); font-weight: 600; transition: 0.2s;}
-      .input-login:focus { border-color: var(--secondary); background: white; }
-      .btn-auth { width: 100%; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; box-shadow: 0 10px 20px rgba(25, 118, 210, 0.3); transition:0.2s; }
-      .btn-auth:disabled { background: #B0BEC5; cursor: not-allowed; box-shadow: none; color: #546E7A;}
-      .btn-auth:active { transform: scale(0.98); box-shadow: 0 5px 10px rgba(25, 118, 210, 0.2); }
-      .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; backdrop-filter: blur(2px);} .modal-overlay.show { visibility: visible; opacity: 1; } .modal { background: white; width: 80%; max-width: 300px; padding: 25px; border-radius: 25px; text-align: center; transform: scale(0.8); transition: 0.3s; box-shadow: 0 30px 70px rgba(0,0,0,0.4); border: var(--card-border); } .modal-overlay.show .modal { transform: scale(1); } .loader { width: 40px; height: 40px; border: 4px solid #ECEFF1; border-top: 4px solid var(--secondary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; } @keyframes spin { 100% { transform: rotate(360deg); } } .input-note { width: 100%; padding: 12px; border-radius: 15px; border: 2px solid #CFD8DC; margin-top: 15px; text-align: center; display: none; background: #F5F7FA; color: var(--text); font-weight: 600;} .btn-toggle-note { background: transparent; border: none; color: #78909C; font-size: 12px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: 700;}
-      .btn-check-siswa { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border: 2px solid #90CAF9; padding: 8px 16px; border-radius: 12px; font-size: 12px; cursor: pointer; font-weight: 800; color: #0D47A1; transition: 0.2s; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.2); }
-      .btn-check-siswa:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(33, 150, 243, 0.1); }
-      .filter-box { display: flex; gap: 10px; margin-bottom: 15px; } .select-mode { padding: 10px; border-radius: 12px; border: 2px solid var(--secondary); font-family: inherit; flex: 1; background: white; color: var(--secondary); font-weight: 700;} .input-date-dyn { padding: 10px; border-radius: 12px; border: 2px solid var(--secondary); font-family: inherit; flex: 1.5; background: white; color: var(--secondary); font-weight: 700;} .tabs { display: flex; background: #F5F7FA; padding: 5px; border-radius: 15px; margin-bottom: 15px; border: var(--elem-border);} .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 12px; font-weight: 700; color: #78909C; font-size: 14px; transition: 0.2s; cursor:pointer;} .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3); } 
-      .tracking-list { max-height: 300px; overflow-y: auto; text-align: left; border: var(--elem-border); border-radius: 15px; } .track-group { margin-bottom: 0; } .track-head { font-size: 14px; font-weight: 800; margin-bottom: 0; display: flex; align-items: center; padding: 10px; background: #F5F7FA; border-bottom: 1px solid #eee;} .track-count { font-size: 12px; background: white; padding: 2px 10px; border-radius: 10px; margin-left: auto; border: 1px solid #eee; color: #555;} .track-item { font-size: 13px; padding: 10px; border-bottom: 1px solid #eee; color: var(--text); font-weight: 600; background: white;} .cl-green { color: var(--yes); } .cl-red { color: var(--no); }
-      .admin-list-container { max-height: 400px; overflow-y: auto; border: var(--elem-border); border-radius: 15px; background: #F5F7FA;} .admin-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: white; } .admin-item:last-child { border-bottom: none; } .ai-info b { font-size: 14px; color: var(--text); } .ai-info span { font-size: 11px; color: #78909C; display: block; font-weight: 600;} .btn-del { width: 35px; height: 35px; border-radius: 10px; background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; display: flex; align-items: center; justify-content: center; cursor: pointer; } .fab-add { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary-grad); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 30px rgba(255, 143, 0, 0.4); cursor: pointer; z-index: 900; transition: transform 0.2s; border: 2px solid rgba(255,255,255,0.5);} .fab-add:active { transform: scale(0.9); } .fab-add i { font-size: 32px; }
-      #print-area { display: none; }
+        body { background-color: #fdfbf7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .hidden-view { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar hide */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Loader */
+        .loader-dots div { animation-timing-function: cubic-bezier(0, 1, 1, 0); }
+        .loader-dots div:nth-child(1) { left: 8px; animation: loader-dots1 0.6s infinite; }
+        .loader-dots div:nth-child(2) { left: 8px; animation: loader-dots2 0.6s infinite; }
+        .loader-dots div:nth-child(3) { left: 32px; animation: loader-dots2 0.6s infinite; }
+        .loader-dots div:nth-child(4) { left: 56px; animation: loader-dots3 0.6s infinite; }
+        @keyframes loader-dots1 { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        @keyframes loader-dots3 { 0% { transform: scale(1); } 100% { transform: scale(0); } }
+        @keyframes loader-dots2 { 0% { transform: translate(0, 0); } 100% { transform: translate(24px, 0); } }
+
+        /* Emoji Button Active State */
+        .btn-emoji:active { transform: scale(0.92); transition: 0.1s; }
+        .btn-emoji.selected { border-color: #FF9000; background-color: #fff7ed; }
     </style>
-  </head>
-  <body>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "recharts": "https://esm.sh/recharts@^3.6.0"
+  }
+}
+</script>
+</head>
+<body class="text-slate-800 min-h-screen relative">
+
+    <!-- AUDIO SFX -->
     <audio id="sfx-puk" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
-    <div id="view-login">
-      <div class="login-card">
-        <h1 style="margin:0; color:#212121; font-size: 40px; margin-bottom: 5px; font-weight: 800;">EKSIS 2026</h1>
-        <p style="color:#546E7A; margin-bottom:30px; font-weight: 600;">Emoji Kepuasan Siswa</p>
-        <input type="text" id="u" class="input-login" placeholder="Username / NIP">
-        <input type="password" id="p" class="input-login" placeholder="Password">
-        <button id="btn-login" onclick="doLogin()" class="btn-auth">MASUK</button>
-      </div>
+    <!-- LOADING OVERLAY -->
+    <div id="loading-overlay" class="hidden-view fixed inset-0 bg-white/90 z-[100] flex items-center justify-center backdrop-blur-sm flex-col">
+        <div class="loader-dots relative w-20 h-5">
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+        </div>
+        <div id="loading-text" class="mt-4 text-xs font-bold text-slate-400 tracking-widest uppercase">MEMUAT...</div>
     </div>
 
-    <div id="view-app" style="display:none;">
-      <div class="app-header">
-        <div class="profile-area">
-          <div class="profile-icon"><i id="hdr-icon" class="material-icons-round">person</i></div>
-          <div class="user-greet"><h2 id="hdr-nama">Halo...</h2><p id="hdr-role">Memuat...</p></div>
-        </div>
-        <div class="btn-home-header" onclick="navTo('home')" id="hdr-btn-home"><i class="material-icons-round">home</i></div>
-      </div>
+    <!-- TOAST -->
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[110] flex flex-col gap-2 w-11/12 max-w-sm pointer-events-none"></div>
 
-      <div class="content-area">
-        <div id="page-home" class="page-section fade-in">
-          <div id="guru-reward-area" class="hide">
-             <div class="reward-section-title"><i class="material-icons-round" style="font-size:16px;">emoji_events</i> REWARD GURU HARI INI</div>
-             <div class="reward-grid">
-               <div class="card card-reward cr-gold">
-                 <i class="material-icons-round cr-lead-icon">stars</i>
-                 <span class="cr-title">GURU BINTANG</span>
-                 <div class="cr-name-box"><span id="home-bintang-name" class="cr-name-text">-</span></div>
-                 <div id="home-bintang-val" class="cr-val">0%</div>
-               </div>
-               <div class="card card-reward cr-blue">
-                 <i class="material-icons-round cr-lead-icon">verified</i>
-                 <span class="cr-title">GURU TERAJIN</span>
-                 <div class="cr-name-box"><span id="home-rajin-name" class="cr-name-text">-</span></div>
-                 <div id="home-rajin-val" class="cr-val">0 Hari</div>
-               </div>
+    <!-- VIEW: LOGIN -->
+    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6 bg-[#FF9000] relative overflow-hidden">
+        <!-- Background Decor -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#FF9000] via-[#FF6B00] to-[#E65100]"></div>
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        
+        <div class="w-full max-w-sm flex flex-col items-center z-10 relative fade-in">
+            <div class="w-24 h-24 bg-white/20 backdrop-blur-md rounded-3xl p-4 mb-6 shadow-2xl flex items-center justify-center rotate-3 border border-white/20">
+                <i data-lucide="smile" class="text-white w-12 h-12"></i>
+            </div>
+            
+            <h1 class="text-4xl font-extrabold text-white mb-2 tracking-tight">EKSIS 2026</h1>
+            <p class="text-orange-100 text-xs mb-10 tracking-[0.3em] uppercase font-bold bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm">Emoji Kepuasan Siswa</p>
+            
+            <div class="w-full space-y-4 bg-white/10 backdrop-blur-xl p-6 rounded-[2rem] border border-white/20 shadow-xl">
+                <input type="text" id="u" class="w-full px-5 py-4 bg-white/90 rounded-2xl border-0 text-slate-800 font-bold placeholder-slate-400 focus:ring-2 focus:ring-white transition-all shadow-inner" placeholder="Username / NIP">
+                <input type="password" id="p" class="w-full px-5 py-4 bg-white/90 rounded-2xl border-0 text-slate-800 font-bold placeholder-slate-400 focus:ring-2 focus:ring-white transition-all shadow-inner" placeholder="Password">
+                
+                <button onclick="doLogin()" class="w-full py-4 bg-white text-[#E65100] rounded-2xl font-extrabold text-lg shadow-lg hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    MASUK <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <p class="mt-8 text-[10px] text-white/50 font-medium">SD Negeri 3 Krisak &copy; 2026</p>
+        </div>
+    </div>
+
+    <!-- VIEW: DASHBOARD & APP CONTAINER -->
+    <div id="view-app" class="hidden-view max-w-md mx-auto min-h-screen bg-[#fdfbf7] relative shadow-2xl pb-24">
+        
+        <!-- HEADER -->
+        <div class="sticky top-0 z-30 bg-[#fdfbf7]/95 backdrop-blur-sm px-6 pt-8 pb-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primaryDark text-white flex items-center justify-center font-bold text-xl border-4 border-white shadow-lg">
+                   <span id="hdr-avatar">G</span>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5" id="hdr-role">Guru</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 leading-none truncate w-40" id="hdr-nama">Halo...</h2>
+                </div>
+            </div>
+            <button onclick="doLogout()" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div id="content-area" class="px-6 space-y-6">
+            
+            <!-- PAGE: HOME -->
+            <div id="page-home" class="fade-in">
+                <!-- Highlight Card -->
+                <div class="bg-gradient-to-br from-primary to-primaryDark rounded-[2rem] p-6 text-white shadow-xl shadow-orange-200 relative overflow-hidden mb-6">
+                    <div class="absolute right-[-20px] top-[-20px] w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <p class="text-orange-100 text-xs font-bold uppercase mb-1 tracking-wide relative z-10">Status Aplikasi</p>
+                    <h1 class="text-2xl font-bold mb-4 relative z-10">Siap Digunakan</h1>
+                    <div class="flex gap-3 relative z-10">
+                        <div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex-1 border border-white/10">
+                            <i data-lucide="cloud-lightning" class="w-5 h-5 mb-1 text-white"></i>
+                            <p class="text-[10px] text-orange-100 font-bold uppercase">Koneksi</p>
+                            <p class="text-sm font-bold">Online</p>
+                        </div>
+                         <div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex-1 border border-white/10">
+                            <i data-lucide="database" class="w-5 h-5 mb-1 text-white"></i>
+                            <p class="text-[10px] text-orange-100 font-bold uppercase">Sync</p>
+                            <p class="text-sm font-bold">Auto</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reward Section (Initially Hidden) -->
+                <div id="reward-area" class="hidden-view mb-6">
+                    <div class="flex items-center gap-2 mb-3 px-1">
+                        <i data-lucide="award" class="w-4 h-4 text-primary"></i>
+                        <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Reward Guru</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col items-center text-center">
+                            <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="star" class="w-5 h-5"></i></div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Bintang</span>
+                            <span id="rw-star-name" class="font-bold text-slate-800 text-sm truncate w-full">-</span>
+                            <span id="rw-star-val" class="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded-md font-bold mt-1">0%</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col items-center text-center">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="thumbs-up" class="w-5 h-5"></i></div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Terajin</span>
+                            <span id="rw-rajin-name" class="font-bold text-slate-800 text-sm truncate w-full">-</span>
+                            <span id="rw-rajin-val" class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-bold mt-1">0 Hari</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Grid -->
+                <div>
+                     <div class="flex items-center gap-2 mb-3 px-1">
+                        <i data-lucide="layout-grid" class="w-4 h-4 text-primary"></i>
+                        <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Menu Utama</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <!-- Survey -->
+                        <button onclick="navTo('survey')" id="btn-survey" class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-4 text-left group">
+                            <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-100 transition">
+                                <i data-lucide="smile-plus" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Survey Karakter</h3>
+                                <p class="text-xs text-slate-400 font-medium">Input mood & absensi harian</p>
+                            </div>
+                            <div class="ml-auto w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </div>
+                        </button>
+
+                         <!-- KAIH -->
+                        <button onclick="navTo('kaih')" id="btn-kaih" class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-4 text-left group">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition">
+                                <i data-lucide="list-checks" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">KAIH (7 Habits)</h3>
+                                <p class="text-xs text-slate-400 font-medium">Checklist kebiasaan baik</p>
+                            </div>
+                            <div class="ml-auto w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </div>
+                        </button>
+
+                         <!-- Rekap -->
+                        <button onclick="navTo('rekap')" class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-4 text-left group">
+                            <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-100 transition">
+                                <i data-lucide="bar-chart-2" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Rekap & Analisis</h3>
+                                <p class="text-xs text-slate-400 font-medium">Data laporan & AI Insight</p>
+                            </div>
+                            <div class="ml-auto w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </div>
+                        </button>
+                        
+                         <!-- Admin (Hidden by default) -->
+                        <button onclick="navTo('admin')" id="btn-admin" class="hidden-view bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-4 text-left group">
+                            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-100 transition">
+                                <i data-lucide="settings-2" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Admin Panel</h3>
+                                <p class="text-xs text-slate-400 font-medium">Kelola data sekolah</p>
+                            </div>
+                             <div class="ml-auto w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: SURVEY -->
+            <div id="page-survey" class="hidden-view fade-in">
+                 <div class="flex items-center gap-3 mb-6">
+                    <button onclick="navTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-90 transition">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-slate-800">Survey Karakter</h2>
+                </div>
+
+                <!-- Class Selector for Guru Mapel -->
+                <div id="survey-class-selector" class="hidden-view bg-white p-6 rounded-[2rem] shadow-card border border-slate-100 text-center">
+                    <div class="w-16 h-16 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="users" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">Pilih Kelas</h3>
+                    <select id="sel-mapel-kelas" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-slate-700 outline-none border border-slate-200 focus:border-primary mb-4 appearance-none text-center"></select>
+                    <button onclick="startMapelSurvey()" class="w-full py-3 bg-primary text-white rounded-xl font-bold shadow-lg shadow-orange-200 active:scale-95 transition">MULAI</button>
+                </div>
+
+                <!-- Survey Content -->
+                <div id="survey-content" class="hidden-view">
+                    <!-- Student Card -->
+                    <div class="bg-white p-6 rounded-[2.5rem] shadow-lg shadow-slate-100 border border-slate-100 text-center mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primaryDark"></div>
+                        <div class="inline-block px-3 py-1 bg-slate-50 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 border border-slate-100" id="lbl-counter">1 / 30</div>
+                        <h2 class="text-3xl font-black text-slate-800 mb-1" id="lbl-panggil">Nama</h2>
+                        <p class="text-sm font-bold text-slate-400" id="lbl-nama">Nama Lengkap</p>
+                        
+                        <!-- Absen Chips -->
+                        <div class="flex gap-2 mt-6 justify-center">
+                            <button onclick="setAbsen('Hadir')" id="c-hadir" class="flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all bg-slate-800 text-white shadow-lg transform -translate-y-1">Hadir</button>
+                            <button onclick="setAbsen('Sakit')" id="c-sakit" class="flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all bg-slate-50 text-slate-400 border-slate-200">Sakit</button>
+                            <button onclick="setAbsen('Izin')" id="c-izin" class="flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all bg-slate-50 text-slate-400 border-slate-200">Izin</button>
+                            <button onclick="setAbsen('Alpha')" id="c-alpha" class="flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all bg-slate-50 text-slate-400 border-slate-200">Alpha</button>
+                        </div>
+                    </div>
+
+                    <!-- Emoji Grid -->
+                    <div id="emoji-area" class="grid grid-cols-2 gap-4 mb-6">
+                        <button onclick="saveEmoji('Sangat Senang')" class="btn-emoji bg-green-50 border-2 border-green-100 rounded-[2rem] p-6 flex flex-col items-center gap-2 relative overflow-hidden group">
+                             <div class="text-5xl group-hover:scale-110 transition duration-300 drop-shadow-sm">🤩</div>
+                             <span class="text-xs font-extrabold text-green-700 uppercase tracking-wider">Senang</span>
+                        </button>
+                         <button onclick="saveEmoji('Paham')" class="btn-emoji bg-blue-50 border-2 border-blue-100 rounded-[2rem] p-6 flex flex-col items-center gap-2 relative overflow-hidden group">
+                             <div class="text-5xl group-hover:scale-110 transition duration-300 drop-shadow-sm">😊</div>
+                             <span class="text-xs font-extrabold text-blue-700 uppercase tracking-wider">Paham</span>
+                        </button>
+                         <button onclick="saveEmoji('Biasa Saja')" class="btn-emoji bg-amber-50 border-2 border-amber-100 rounded-[2rem] p-6 flex flex-col items-center gap-2 relative overflow-hidden group">
+                             <div class="text-5xl group-hover:scale-110 transition duration-300 drop-shadow-sm">😐</div>
+                             <span class="text-xs font-extrabold text-amber-700 uppercase tracking-wider">Biasa</span>
+                        </button>
+                         <button onclick="saveEmoji('Bingung/Sedih')" class="btn-emoji bg-red-50 border-2 border-red-100 rounded-[2rem] p-6 flex flex-col items-center gap-2 relative overflow-hidden group">
+                             <div class="text-5xl group-hover:scale-110 transition duration-300 drop-shadow-sm">😢</div>
+                             <span class="text-xs font-extrabold text-red-700 uppercase tracking-wider">Bingung</span>
+                        </button>
+                    </div>
+                    
+                    <button id="btn-absen-save" onclick="saveAbsen()" class="hidden-view w-full py-4 bg-slate-800 text-white rounded-2xl font-bold shadow-lg mb-4">SIMPAN DATA</button>
+
+                    <!-- Navigation -->
+                     <div class="flex items-center justify-between px-4">
+                        <button onclick="navSiswa(-1)" class="w-12 h-12 rounded-full bg-white border border-slate-200 text-slate-400 flex items-center justify-center shadow-sm active:scale-90 transition"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+                         <button onclick="toggleNote()" class="text-xs font-bold text-slate-400 flex items-center gap-1 hover:text-primary transition"><i data-lucide="message-square-plus" class="w-4 h-4"></i> CATATAN</button>
+                        <button onclick="navSiswa(1)" class="w-12 h-12 rounded-full bg-white border border-slate-200 text-slate-400 flex items-center justify-center shadow-sm active:scale-90 transition"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                    </div>
+                    
+                    <div id="note-area" class="hidden-view mt-4">
+                        <textarea id="inp-note" class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm font-medium focus:border-primary outline-none shadow-sm" placeholder="Catatan tambahan untuk siswa ini..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: KAIH -->
+            <div id="page-kaih" class="hidden-view fade-in">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="navTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-90 transition">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-slate-800">Checklist KAIH</h2>
+                    <div class="ml-auto bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold" id="k-counter">1/30</div>
+                </div>
+                
+                 <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-card mb-4 flex items-center gap-4">
+                     <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl" id="k-avatar">A</div>
+                     <div>
+                         <h3 class="font-bold text-slate-800 text-lg leading-tight" id="k-nama">Nama Siswa</h3>
+                         <p class="text-xs text-slate-400 font-bold uppercase mt-0.5">7 Habits</p>
+                     </div>
+                 </div>
+
+                 <div id="kaih-list" class="space-y-3 pb-24"></div>
+
+                 <!-- Floating Action Button for Save -->
+                 <div class="fixed bottom-6 left-0 w-full px-6 flex justify-center z-40">
+                     <button onclick="saveKaih()" class="w-full max-w-sm py-4 bg-gradient-to-r from-primary to-primaryDark text-white rounded-2xl font-bold shadow-lg shadow-orange-200 active:scale-95 transition flex items-center justify-center gap-2">
+                         <i data-lucide="check-circle" class="w-5 h-5"></i> SIMPAN & LANJUT
+                     </button>
+                 </div>
+            </div>
+
+            <!-- PAGE: REKAP -->
+             <div id="page-rekap" class="hidden-view fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <button onclick="navTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-90 transition">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-slate-800">Rekapitulasi</h2>
+                    <button onclick="loadDash()" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-primary shadow-sm active:scale-90 transition">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div id="ks-filter-area" class="hidden-view mb-4">
+                     <select id="sel-filter-ks" onchange="loadDash()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-primary"></select>
+                </div>
+                
+                <div class="flex gap-3 mb-6">
+                     <select id="sel-mode" onchange="toggleDateInput()" class="flex-1 p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-primary">
+                         <option value="harian">Harian</option>
+                         <option value="mingguan">Mingguan</option>
+                         <option value="bulanan">Bulanan</option>
+                         <option value="total">Total</option>
+                     </select>
+                     <input type="date" id="inp-date" onchange="loadDash()" class="flex-[1.5] p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-primary">
+                     <input type="month" id="inp-month" onchange="loadDash()" class="hidden-view flex-[1.5] p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-primary">
+                </div>
+
+                <!-- Tabs -->
+                <div class="bg-white p-1.5 rounded-2xl border border-slate-100 flex mb-6 shadow-sm">
+                    <button onclick="switchTab('emoji')" id="tab-emoji" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-white shadow-md">EMOJI</button>
+                    <button onclick="switchTab('kaih')" id="tab-kaih" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-600">KAIH</button>
+                </div>
+
+                <!-- Content Emoji -->
+                <div id="panel-emoji" class="space-y-4">
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-card text-center">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4" id="dash-title">...</h3>
+                        <div class="grid grid-cols-4 gap-2 mb-6">
+                            <div class="bg-green-50 p-2 rounded-xl border border-green-100"><div class="text-2xl font-black text-green-600" id="val-senang">0</div><div class="text-[10px] font-bold text-green-400 uppercase">Senang</div></div>
+                            <div class="bg-blue-50 p-2 rounded-xl border border-blue-100"><div class="text-2xl font-black text-blue-600" id="val-paham">0</div><div class="text-[10px] font-bold text-blue-400 uppercase">Paham</div></div>
+                            <div class="bg-amber-50 p-2 rounded-xl border border-amber-100"><div class="text-2xl font-black text-amber-600" id="val-biasa">0</div><div class="text-[10px] font-bold text-amber-400 uppercase">Biasa</div></div>
+                            <div class="bg-red-50 p-2 rounded-xl border border-red-100"><div class="text-2xl font-black text-red-600" id="val-sedih">0</div><div class="text-[10px] font-bold text-red-400 uppercase">Bingung</div></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-slate-50 text-xs font-bold text-slate-500">
+                             <div>S: <span class="text-orange-500" id="st-s">0</span> &bull; I: <span class="text-blue-500" id="st-i">0</span> &bull; A: <span class="text-red-500" id="st-a">0</span></div>
+                             <button onclick="checkProgress()" class="text-primary hover:underline">Cek Siswa <i data-lucide="arrow-right" class="w-3 h-3 inline"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2rem] border-l-4 border-primary shadow-card relative overflow-hidden">
+                        <div class="flex items-center gap-2 mb-3 text-primary font-extrabold uppercase text-xs tracking-wider">
+                           <i data-lucide="brain-circuit" class="w-4 h-4"></i> Analisis AI
+                        </div>
+                        <p class="text-sm font-medium text-slate-700 leading-relaxed italic" id="txt-analisis">Memuat...</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2rem] border-l-4 border-slate-600 shadow-card">
+                        <div class="flex items-center gap-2 mb-3 text-slate-600 font-extrabold uppercase text-xs tracking-wider">
+                           <i data-lucide="lightbulb" class="w-4 h-4"></i> Rekomendasi
+                        </div>
+                         <p class="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-line" id="txt-saran">...</p>
+                    </div>
+                </div>
+                
+                 <!-- Content KAIH -->
+                <div id="panel-kaih" class="hidden-view">
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-card">
+                        <h4 class="font-bold text-slate-800 mb-4">Grafik Capaian KAIH</h4>
+                        <div id="chart-kaih" class="space-y-3"></div>
+                    </div>
+                </div>
+
              </div>
-          </div>
 
-          <div style="text-align:center; margin-bottom:10px;"><h3 style="margin:0; color:#546E7A; font-weight: 800;">Menu Utama</h3></div>
-          <div class="menu-grid">
-            <div id="menu-survey" class="menu-item m-green" onclick="navTo('survey')">
-              <div class="menu-badge"><i class="material-icons-round">face</i></div>
-              <div class="m-text-box"><div class="menu-label">Survey</div><div class="menu-desc">Harian & Absen</div></div>
-            </div>
-            <div id="menu-kaih" class="menu-item m-blue" onclick="navTo('kaih')">
-              <div class="menu-badge"><i class="material-icons-round">checklist</i></div>
-              <div class="m-text-box"><div class="menu-label">KAIH</div><div class="menu-desc">Kebiasaan Anak</div></div>
-            </div>
-            <div class="menu-item m-orange" onclick="navTo('rekap')">
-              <div class="menu-badge"><i class="material-icons-round">analytics</i></div>
-              <div class="m-text-box"><div class="menu-label">Rekap</div><div class="menu-desc">Laporan Kelas</div></div>
-            </div>
-            <div id="menu-admin" class="menu-item m-purple hide" onclick="navTo('admin')">
-              <div class="menu-badge"><i class="material-icons-round">manage_accounts</i></div>
-              <div class="m-text-box"><div class="menu-label">Data Sekolah</div><div class="menu-desc">Admin Siswa/Guru</div></div>
-            </div>
-            <div class="menu-item m-red" onclick="doLogout()">
-              <div class="menu-badge"><i class="material-icons-round">logout</i></div>
-              <div class="m-text-box"><div class="menu-label">Keluar</div><div class="menu-desc">Tutup Sesi</div></div>
-            </div>
-          </div>
+             <!-- PAGE: ADMIN -->
+             <div id="page-admin" class="hidden-view fade-in">
+                 <div class="flex items-center gap-3 mb-6">
+                    <button onclick="navTo('home')" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-90 transition">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-slate-800">Admin Data</h2>
+                </div>
+                
+                <div class="bg-white p-1.5 rounded-2xl border border-slate-100 flex mb-4 shadow-sm">
+                    <button onclick="switchAdminTab('siswa')" id="adm-tab-siswa" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-white shadow-md">SISWA</button>
+                    <button onclick="switchAdminTab('guru')" id="adm-tab-guru" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-600">GURU</button>
+                </div>
+
+                <div id="adm-content-siswa">
+                    <select id="sel-adm-kelas" onchange="loadAdminData('siswa')" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 mb-4 outline-none focus:border-primary"></select>
+                    <div id="list-adm-siswa" class="space-y-2 pb-20"></div>
+                </div>
+
+                 <div id="adm-content-guru" class="hidden-view">
+                     <div id="list-adm-guru" class="space-y-2 pb-20"></div>
+                 </div>
+
+                 <button onclick="openAddModal()" class="fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg shadow-orange-200 flex items-center justify-center hover:scale-105 active:scale-90 transition z-40">
+                     <i data-lucide="plus" class="w-8 h-8"></i>
+                 </button>
+             </div>
         </div>
-
-        <div id="page-admin" class="page-section hide fade-in">
-           <div class="survey-header">
-             <button class="btn-back-modern" onclick="navTo('home')"><i class="material-icons-round">arrow_back</i></button>
-             <span>Data Sekolah</span> <div class="header-spacer"></div>
-           </div>
-           <div class="tabs">
-             <div id="tab-adm-siswa" class="tab-btn active" onclick="switchAdminTab('siswa')">Siswa</div>
-             <div id="tab-adm-guru" class="tab-btn" onclick="switchAdminTab('guru')">Guru</div>
-           </div>
-           <div id="adm-panel-siswa">
-             <select id="sel-adm-kelas" class="input-login" style="margin-bottom:15px; padding:10px;" onchange="loadAdminData('siswa')"><option value="semua">Semua Kelas</option></select>
-             <div class="card" style="padding:10px;"><div id="list-adm-siswa" class="admin-list-container">Memuat...</div></div>
-           </div>
-           <div id="adm-panel-guru" class="hide">
-             <div class="card" style="padding:10px;"><div id="list-adm-guru" class="admin-list-container">Memuat...</div></div>
-           </div>
-           <div class="fab-add" onclick="openAddModal()"><i class="material-icons-round">add</i></div>
-        </div>
-
-        <div id="page-survey" class="page-section hide fade-in">
-          <div id="panel-pilih-kelas" class="card hide"><h3>Pilih Kelas</h3><select id="sel-kelas-mapel" class="input-login" style="margin-bottom:20px;"></select><button onclick="startMapelSurvey()" class="btn-auth" style="margin:0;">MULAI</button></div>
-          <div id="panel-survey-area">
-            <div class="card" style="overflow:visible;">
-              <div style="font-size:11px; color:#90A4AE; text-align:center; text-transform:uppercase; letter-spacing:1px; font-weight: 700;" id="lbl-kelas-aktif">KELAS -</div>
-              <div class="siswa-info"><div id="lbl-panggil" class="siswa-nick">Nama</div><div id="lbl-nama" class="siswa-full">Nama Lengkap</div></div>
-              <div class="absen-bar">
-                <div class="chip active" id="c-hadir" onclick="setAbsen('Hadir')">Hadir</div><div class="chip" id="c-sakit" onclick="setAbsen('Sakit')">Sakit</div><div class="chip" id="c-izin" onclick="setAbsen('Izin')">Izin</div><div class="chip" id="c-alpha" onclick="setAbsen('Alpha')">Alpha</div>
-              </div>
-              <div id="box-emoji" class="emoji-grid">
-                <div class="btn-emoji e-senang" onclick="saveEmoji('Sangat Senang', this)"><div class="emoji-img">🤩</div><div class="emoji-label">SENANG</div></div>
-                <div class="btn-emoji e-paham" onclick="saveEmoji('Paham', this)"><div class="emoji-img">😊</div><div class="emoji-label">PAHAM</div></div>
-                <div class="btn-emoji e-biasa" onclick="saveEmoji('Biasa Saja', this)"><div class="emoji-img">😐</div><div class="emoji-label">BIASA</div></div>
-                <div class="btn-emoji e-sedih" onclick="saveEmoji('Bingung/Sedih', this)"><div class="emoji-img">😢</div><div class="emoji-label">BINGUNG</div></div>
-              </div>
-              <button id="btn-save-absen" onclick="saveAbsen()" class="btn-auth hide" style="background:#78909C; margin-top:0;">SIMPAN TIDAK HADIR</button>
-              <button class="btn-toggle-note" onclick="toggleNote()">+ Tambah Catatan Guru</button>
-              <input type="text" id="inp-note" class="input-note" placeholder="Catatan tambahan...">
-            </div>
-            <div class="nav-controls">
-              <button class="btn-nav-round" onclick="navSiswa(-1)"><i class="material-icons-round">chevron_left</i></button>
-              <div class="counter-badge" id="lbl-counter">0 / 0</div> <button class="btn-nav-round" onclick="navSiswa(1)"><i class="material-icons-round">chevron_right</i></button>
-            </div>
-          </div>
-        </div>
-
-        <div id="page-kaih" class="page-section hide fade-in">
-          <div class="card">
-            <div class="siswa-info"><div class="siswa-nick" id="k-nama" style="font-size:24px;">Nama</div><div class="siswa-full">Checklist Kebiasaan</div></div>
-            <div id="kaih-render" class="kaih-list"></div>
-            <button onclick="saveKaih()" class="btn-auth">SIMPAN DATA</button>
-          </div>
-          <div class="nav-controls">
-            <button class="btn-nav-round" onclick="navSiswaKaih(-1)"><i class="material-icons-round">chevron_left</i></button>
-            <div class="counter-badge" id="lbl-counter-kaih">0 / 0</div> <button class="btn-nav-round" onclick="navSiswaKaih(1)"><i class="material-icons-round">chevron_right</i></button>
-          </div>
-        </div>
-
-        <div id="page-rekap" class="page-section hide fade-in">
-          <div class="survey-header"> 
-            <button id="btn-back-rekap" class="btn-back-modern"><i class="material-icons-round">arrow_back</i></button> 
-            <span>Dashboard</span> 
-            <button onclick="manualRefresh()" class="btn-back-modern" style="color:var(--secondary);"><i id="icon-refresh" class="material-icons-round">refresh</i></button>
-          </div>
-
-          <div id="ks-panel" class="card hide" style="border-left:5px solid #FFB300;"><h4 style="margin:0 0 10px 0; color: #F57C00;">Filter Kelas</h4><select id="sel-filter-ks" class="input-login" style="margin:0; padding:10px;" onchange="loadDashboard()"></select></div>
-          <div class="filter-box">
-            <select id="sel-mode" class="input-login" style="margin:0; padding:10px; flex:1;" onchange="toggleDateInput()"><option value="harian">Harian</option><option value="mingguan">Mingguan</option><option value="bulanan">Bulanan</option><option value="total">Total</option></select>
-            <input type="date" id="inp-date" class="input-date-dyn" onchange="loadDashboard()"><input type="month" id="inp-month" class="input-date-dyn hide" onchange="loadDashboard()">
-          </div>
-          <div class="tabs"><div id="tab-emoji" class="tab-btn active" onclick="switchTab('emoji')">😊 Emoji</div><div id="tab-kaih" class="tab-btn" onclick="switchTab('kaih')">📋 KAIH</div></div>
-          
-          <div id="panel-rekap-emoji">
-            <div class="dashboard-card">
-              <div id="dash-header-title" style="text-align:center; font-weight:800; margin-bottom:10px; color:var(--text);">...</div>
-              <div class="stat-grid-4">
-                <div class="stat-item st-senang"><span class="stat-num-small" id="val-senang">0</span><span class="stat-lbl-small">Senang</span></div>
-                <div class="stat-item st-paham"><span class="stat-num-small" id="val-paham">0</span><span class="stat-lbl-small">Paham</span></div>
-                <div class="stat-item st-biasa"><span class="stat-num-small" id="val-biasa">0</span><span class="stat-lbl-small">Biasa</span></div>
-                <div class="stat-item st-sedih"><span class="stat-num-small" id="val-sedih">0</span><span class="stat-lbl-small">Bingung</span></div>
-              </div>
-              <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:flex; justify-content:space-between; align-items:center;">
-                  <div style="font-size:12px; color:#78909C; font-weight:700;">
-                    Sakit: <b id="st-s" style="color:#FF9800">0</b> | Izin: <b id="st-i" style="color:#2196F3">0</b> | Alpha: <b id="st-a" style="color:#F44336">0</b>
-                  </div>
-                  <button onclick="checkProgress()" class="btn-check-siswa">
-                    <i class="material-icons-round" style="font-size:16px; margin-right:5px;">how_to_reg</i> Cek: <span id="stat-hadir-mini" style="margin-left:3px;">0/0</span>
-                  </button>
-              </div>
-            </div>
-            <div class="analysis-card"><div class="analysis-title"><i class="material-icons-round">analytics</i> Analisis Hasil</div><div id="txt-analisis" style="font-size:14px; color:var(--text); line-height:1.5; font-weight: 600;">Memuat analisis...</div></div>
-            <div class="reco-card"><div class="reco-title"><i class="material-icons-round">lightbulb</i> Rekomendasi</div><div id="txt-saran" style="font-size:14px; color:var(--text); white-space:pre-line; font-weight: 600;">...</div></div>
-          </div>
-          <div id="panel-rekap-kaih" class="hide"><div class="dashboard-card"><h4 style="margin:0 0 15px 0; color:#1565C0;">Grafik Capaian KAIH</h4><div id="chart-kaih" style="font-size:12px;"></div></div></div>
-        </div>
-      </div>
     </div>
 
-    <div class="modal-overlay" id="modal"><div class="modal"><div id="modal-load" class="loader hide"></div><i id="modal-icon" class="material-icons-round" style="font-size:50px; margin-bottom:10px;">check_circle</i><h3 id="modal-head" style="margin:0; color: var(--text);">Judul</h3><p id="modal-body" style="color:#546E7A; font-size:14px; margin:10px 0 20px 0; font-weight: 600;">Pesan</p><button id="modal-btn" onclick="closePopup()" class="btn-auth" style="margin:0; padding:10px;">OK</button></div></div>
-    <div class="modal-overlay" id="modal-list"><div class="modal" style="width:90%; max-width:400px; text-align:left;"><h3 style="margin:0 0 15px 0; border-bottom:1px solid #eee; padding-bottom:10px; color: var(--text);">Status Input Hari Ini</h3><div class="tracking-list" id="track-content">Loading...</div><button onclick="closeList()" class="btn-auth" style="margin-top:15px; padding:10px;">TUTUP</button></div></div>
+    <!-- MODAL ADD DATA -->
+    <div id="modal-add" class="hidden-view fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <h3 class="text-xl font-bold text-slate-800 mb-1">Tambah <span id="lbl-add-type">Data</span></h3>
+            <p class="text-xs text-slate-400 mb-4">Silakan lengkapi form di bawah ini.</p>
+            
+            <div id="form-siswa" class="space-y-3 hidden-view">
+                <input id="add-s-nis" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="NIS">
+                <input id="add-s-nama" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Nama Lengkap">
+                <input id="add-s-panggil" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Nama Panggilan">
+                 <select id="add-s-jk" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
+                <input id="add-s-kelas" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Kelas (Contoh: 1A)">
+            </div>
+             <div id="form-guru" class="space-y-3 hidden-view">
+                <input id="add-g-u" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Username">
+                <input id="add-g-p" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Password">
+                <input id="add-g-nama" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Nama Guru">
+                 <select id="add-g-role" onchange="toggleRoleInput()" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary">
+                    <option value="Guru Kelas">Guru Kelas</option><option value="Guru Mapel">Guru Mapel</option><option value="KS">Kepala Sekolah</option>
+                 </select>
+                <input id="add-g-kelas" class="w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Wali Kelas (Contoh: 1A)">
+                 <input id="add-g-mapel" class="hidden-view w-full p-3 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Mapel (Contoh: PJOK)">
+            </div>
 
-    <div class="modal-overlay" id="modal-add"><div class="modal" style="text-align:left;">
-      <h3 style="margin-top:0; color: var(--text);">Tambah Data <span id="lbl-add-type"></span></h3>
-      <div id="form-siswa" class="hide">
-         <input id="add-s-nis" class="input-login" placeholder="NIS" style="padding:10px; margin:5px 0;">
-         <input id="add-s-nama" class="input-login" placeholder="Nama Lengkap" style="padding:10px; margin:5px 0;">
-         <input id="add-s-panggil" class="input-login" placeholder="Nama Panggilan" style="padding:10px; margin:5px 0;">
-         <select id="add-s-jk" class="input-login" style="padding:10px; margin:5px 0;"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
-         <input id="add-s-kelas" class="input-login" placeholder="Kelas (Contoh: 1A)" style="padding:10px; margin:5px 0;">
-      </div>
-      <div id="form-guru" class="hide">
-         <input id="add-g-u" class="input-login" placeholder="Username" style="padding:10px; margin:5px 0;">
-         <input id="add-g-p" class="input-login" placeholder="Password" style="padding:10px; margin:5px 0;">
-         <input id="add-g-nama" class="input-login" placeholder="Nama Guru" style="padding:10px; margin:5px 0;">
-         <select id="add-g-role" class="input-login" style="padding:10px; margin:5px 0;" onchange="toggleRoleInput()">
-            <option value="Guru Kelas">Guru Kelas</option>
-            <option value="Guru Mapel">Guru Mapel</option>
-            <option value="KS">Kepala Sekolah</option>
-         </select>
-         <input id="add-g-kelas" class="input-login" placeholder="Wali Kelas (Contoh: 1A)" style="padding:10px; margin:5px 0;">
-         <input id="add-g-mapel" class="input-login hide" placeholder="Mapel (Contoh: PJOK)" style="padding:10px; margin:5px 0;">
-      </div>
-      <div style="display:flex; gap:10px; margin-top:15px;">
-        <button onclick="closeAddModal()" class="btn-auth" style="background:#CFD8DC; color:#546E7A; margin:0;">Batal</button>
-        <button onclick="saveAdminData()" class="btn-auth" style="margin:0;">Simpan</button>
-      </div>
-    </div></div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="document.getElementById('modal-add').classList.add('hidden-view')" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold text-sm">Batal</button>
+                 <button onclick="saveAdminData()" class="flex-1 py-3 bg-primary text-white rounded-xl font-bold text-sm">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LIST PROGRESS -->
+    <div id="modal-list" class="hidden-view fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5 backdrop-blur-sm">
+         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl flex flex-col max-h-[80vh]">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="list-checks" class="w-5 h-5 text-primary"></i> Status Input Hari Ini</h3>
+            <div id="track-content" class="overflow-y-auto flex-1 space-y-4 pr-2"></div>
+            <button onclick="document.getElementById('modal-list').classList.add('hidden-view')" class="w-full py-3 mt-4 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">TUTUP</button>
+         </div>
+    </div>
 
     <script>
-      // ============================================
-      // CONFIGURATION AREA (WAJIB DIISI)
-      // ============================================
-      const API_URL = "https://script.google.com/macros/s/AKfycbw0uCEkQec7b_ZU_cakKU1yHDyKrhEhOYyrUxa6baewPsWGkVZDV5b6nQFxOqu0ziOe/exec"; 
-      // Contoh: "https://script.google.com/macros/s/AKfycbx.../exec"
-      
-      var USER={}; var LIST=[]; var IDX=0; var KAIH=[null,null,null,null,null,null,null,null];
-      var ABSEN="Hadir"; var DASH={}; var T_KELAS=""; var CURR_ADM_TAB="siswa";
-
-      // --- HELPER FETCH API ---
-      async function requestAPI(action, payload = {}) {
-        payload.action = action;
-        try {
-          const response = await fetch(API_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
-          });
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error("API Error:", error);
-          popup("Koneksi", "Gagal terhubung server", "error");
-          return null;
-        }
-      }
-
-      function playPing(){ var a=document.getElementById('sfx-puk'); if(a){ try { a.currentTime=0; a.play().catch(e=>{}); } catch(err){} } }
-      function popup(t,m,ic){document.getElementById("modal-head").innerText=t; document.getElementById("modal-body").innerText=m;var i=document.getElementById("modal-icon"); var b=document.getElementById("modal-btn"); var l=document.getElementById("modal-load");i.style.display="block"; l.classList.add("hide"); b.classList.remove("hide");i.style.color=ic==="error"?"#D32F2F":(ic==="success"?"#2E7D32":"#1976D2");i.innerText=ic==="error"?"error":(ic==="success"?"check_circle":"info");if(ic==="loading"){i.style.display="none";b.classList.add("hide");l.classList.remove("hide");}document.getElementById("modal").classList.add("show");}
-      function closePopup(){document.getElementById("modal").classList.remove("show");}
-      function closeList(){document.getElementById("modal-list").classList.remove("show");}
-      
-      window.onload=function(){var c=localStorage.getItem("eksis_2026"); if(c){USER=JSON.parse(c); initApp();} document.getElementById("inp-date").valueAsDate=new Date(); var d=new Date(); document.getElementById("inp-month").value=d.getFullYear()+"-"+(d.getMonth()+1).toString().padStart(2,'0');};
-      
-      async function doLogin(){
-        var u=document.getElementById("u").value, p=document.getElementById("p").value; 
-        if(!u||!p){popup("Ups","Isi lengkap","error");return;} 
-        var btn = document.getElementById("btn-login");
-        var originalText = btn.innerText;
-        btn.innerText = "MEMUAT..."; btn.disabled = true; btn.style.opacity = "0.7";
-        popup("Loading","Masuk...","loading"); 
+        // CONFIG
+        const API_URL = "https://script.google.com/macros/s/AKfycbw0uCEkQec7b_ZU_cakKU1yHDyKrhEhOYyrUxa6baewPsWGkVZDV5b6nQFxOqu0ziOe/exec"; 
         
-        var r = await requestAPI("login", {u: u, p: p});
-        btn.innerText = originalText; btn.disabled = false; btn.style.opacity = "1";
-        
-        if(r && r.status==="SUKSES"){
-          USER=r; localStorage.setItem("eksis_2026",JSON.stringify(r)); closePopup(); initApp();
-        } else {
-          popup("Gagal","Cek username/password","error");
-        }
-      }
+        let USER = {};
+        let LIST = [];
+        let IDX = 0;
+        let ABSEN = "Hadir";
+        let KAIH = [null,null,null,null,null,null,null,null];
+        let CURRENT_TAB = 'emoji';
+        let ADM_TAB = 'siswa';
 
-      function initApp(){
-        document.getElementById("view-login").classList.add("hide"); document.getElementById("view-app").style.display="block";
-        document.getElementById("hdr-nama").innerText="Halo, "+USER.nama.split(" ")[0]; 
-        var iconCode = "person";
-        if(USER.role === "KS") iconCode = "admin_panel_settings";
-        else if(USER.mapel === "PAI") iconCode = "menu_book";
-        else if(USER.mapel === "PJOK") iconCode = "sports_soccer";
-        else iconCode = "school"; 
-        document.getElementById("hdr-icon").innerText = iconCode;
-        document.getElementById("hdr-role").innerText=USER.role;
-        
-        if(USER.role === "KS" || USER.role === "Admin") {
-           document.getElementById("menu-admin").classList.remove("hide"); 
-           document.getElementById("menu-survey").classList.add("hide"); 
-           document.getElementById("menu-kaih").classList.add("hide"); 
-        } else {
-           document.getElementById("menu-survey").classList.remove("hide");
-           document.getElementById("menu-kaih").classList.remove("hide");
-           document.getElementById("menu-admin").classList.add("hide");
-        }
-        navTo('home'); loadHomeRewards(); 
-      }
+        // --- UTILS ---
+        const playPing = () => { try { const a = document.getElementById('sfx-puk'); if(a) { a.currentTime = 0; a.play().catch(e=>{}); } } catch(e){} };
+        const showToast = (msg, type='success') => {
+            const c = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `p-4 rounded-xl shadow-lg text-xs font-bold text-white flex items-center gap-3 fade-in ${type==='error'?'bg-red-500':'bg-slate-800'}`;
+            el.innerHTML = type==='error' ? `<i data-lucide="alert-circle" width="16"></i> ${msg}` : `<i data-lucide="check-circle" width="16" class="text-green-400"></i> ${msg}`;
+            c.appendChild(el);
+            lucide.createIcons();
+            setTimeout(() => { el.remove() }, 3000);
+        };
+        const toggleLoading = (show) => document.getElementById('loading-overlay').classList.toggle('hidden-view', !show);
 
-      function doLogout(){localStorage.removeItem("eksis_2026"); location.reload();}
-      function navTo(p){ document.querySelectorAll('.page-section').forEach(e=>e.classList.add('hide')); document.getElementById('page-'+p).classList.remove('hide'); if(p==='survey') prepSurvey(); if(p==='kaih') prepKaih(); if(p==='rekap') prepRekap(); if(p==='admin') prepAdmin(); }
-      
-      async function loadHomeRewards(){
-        var r = await requestAPI("getRewards");
-        if(r) {
-           document.getElementById("guru-reward-area").classList.remove("hide");
-           document.getElementById("home-bintang-name").innerText = r.bintang.nama; document.getElementById("home-bintang-val").innerText = r.bintang.skor+"%";
-           document.getElementById("home-rajin-name").innerText = r.rajin.nama; document.getElementById("home-rajin-val").innerText = r.rajin.total+" Hari";
+        // --- API ---
+        async function req(action, payload = {}) {
+            payload.action = action;
+            try {
+                const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+                return await res.json();
+            } catch(e) {
+                console.error(e);
+                showToast("Gagal terhubung server", "error");
+                return null;
+            }
         }
-      }
 
-      async function prepSurvey(){
-        if(USER.role==="Guru Mapel"){
-          document.getElementById("panel-pilih-kelas").classList.remove("hide"); 
-          document.getElementById("panel-survey-area").classList.add("hide"); 
-          var l = await requestAPI("getKelas");
-          if(l){
-            var s=document.getElementById("sel-kelas-mapel"); s.innerHTML=""; 
-            l.forEach(k=>{var o=document.createElement("option");o.text=k;s.add(o);});
-          }
-        } else {
-          document.getElementById("panel-pilih-kelas").classList.add("hide"); 
-          document.getElementById("panel-survey-area").classList.remove("hide"); 
-          T_KELAS=USER.kelas; loadSiswa();
-        }
-      }
-      function startMapelSurvey(){T_KELAS=document.getElementById("sel-kelas-mapel").value; document.getElementById("panel-pilih-kelas").classList.add("hide"); document.getElementById("panel-survey-area").classList.remove("hide"); loadSiswa();}
-      
-      async function loadSiswa(){
-        document.getElementById("lbl-kelas-aktif").innerText="KELAS "+T_KELAS; 
-        popup("Data","Ambil siswa...","loading"); 
-        var l = await requestAPI("getSiswa", {kelas: T_KELAS});
-        closePopup(); 
-        LIST=l || []; 
-        if(LIST.length>0){IDX=0; renderSiswa();} else {popup("Info","Siswa kosong","error"); navTo('home');}
-      }
-      
-      function renderSiswa(){var s=LIST[IDX]; document.getElementById("lbl-panggil").innerText=s.panggilan; document.getElementById("lbl-panggil").className = "siswa-nick " + (s.gender==="L"?"text-l":"text-p"); document.getElementById("lbl-nama").innerText=s.nama_lengkap; document.getElementById("lbl-counter").innerText=(IDX+1)+"/"+LIST.length; document.getElementById("inp-note").value=""; document.getElementById("inp-note").style.display="none"; setAbsen('Hadir');}
-      function toggleNote(){ var el=document.getElementById("inp-note"); el.style.display=el.style.display==="none"?"block":"none"; if(el.style.display==="block") el.focus(); }
-      function setAbsen(st){ABSEN=st; ['hadir','sakit','izin','alpha'].forEach(x=>document.getElementById('c-'+x).className='chip'); document.getElementById('c-'+st.toLowerCase()).className='chip active ' + (st==='Hadir'?'':st.toLowerCase().charAt(0)); if(st==='Hadir'){ document.getElementById('box-emoji').classList.remove('hide'); document.getElementById('btn-save-absen').classList.add('hide'); } else{ document.getElementById('box-emoji').classList.add('hide'); document.getElementById('btn-save-absen').classList.remove('hide'); } }
-      
-      function saveEmoji(v, el){ 
-        playPing(); el.classList.add("anim-burst");
-        if(!LIST || LIST.length === 0) return;
-        var p={nis:LIST[IDX].nis, nama:LIST[IDX].nama_lengkap, kelas:T_KELAS, mapel:USER.mapel, emoji:v, ket:document.getElementById("inp-note").value, guru:USER.nama}; 
-        requestAPI("simpanEmoji", {data: p});
-        setTimeout(() => { el.classList.remove("anim-burst"); navSiswa(1); }, 200); 
-      }
-      function saveAbsen(){ var p={nis:LIST[IDX].nis, nama:LIST[IDX].nama_lengkap, kelas:T_KELAS, mapel:USER.mapel, emoji:ABSEN, ket:document.getElementById("inp-note").value, guru:USER.nama}; requestAPI("simpanEmoji", {data: p}); navSiswa(1); }
-      function navSiswa(d){ if(d===1 && IDX<LIST.length-1){IDX++; renderSiswa();} else if(d===-1 && IDX>0){IDX--; renderSiswa();} else if(d===1){ popup("Selesai","Data tersimpan!","success"); navTo('home'); } }
-      
-      async function prepKaih(){
-        if(USER.role==="Guru Mapel"){popup("Maaf","Khusus Wali Kelas","error"); navTo('home'); return;} 
-        T_KELAS=USER.kelas; 
-        var habits = [{t:"Bangun Pagi",i:"wb_sunny",c:"kp-1"},{t:"Beribadah",i:"volunteer_activism",c:"kp-2"},{t:"Berolahraga",i:"directions_run",c:"kp-3"},{t:"Makan Sehat",i:"restaurant",c:"kp-4"},{t:"Gemar Belajar",i:"school",c:"kp-5"},{t:"Bermasyarakat",i:"groups",c:"kp-6"},{t:"Tidur Cepat",i:"bed",c:"kp-7"}];
-        var h=""; habits.forEach((x,i)=>{var idx=i+1;h+=`<div class="kaih-item"><div class="kaih-icon ${x.c}"><i class="material-icons-round">${x.i}</i></div><div class="kaih-content"><div class="kaih-title">${idx}. ${x.t}</div><div class="kaih-actions"><div id="hy-${idx}" class="k-btn" onclick="setK(${idx},'Terbiasa')">Terbiasa</div><div id="hn-${idx}" class="k-btn" onclick="setK(${idx},'Belum')">Belum</div></div></div></div>`;});
-        document.getElementById("kaih-render").innerHTML=h; 
-        popup("Data","Ambil siswa...","loading"); 
-        var l = await requestAPI("getSiswa", {kelas: T_KELAS});
-        closePopup(); LIST=l||[]; if(LIST.length>0){IDX=0; renderKaih();} 
-      }
-      function renderKaih(){document.getElementById("k-nama").innerText=LIST[IDX].nama_lengkap; document.getElementById("lbl-counter-kaih").innerText = (IDX+1) + " / " + LIST.length; KAIH=[null,null,null,null,null,null,null,null]; document.querySelectorAll('.k-btn').forEach(e=>e.classList.remove('active-yes','active-no')); }
-      function setK(i,v){ playPing(); KAIH[i]=v; document.getElementById(`hy-${i}`).classList.remove('active-yes'); document.getElementById(`hn-${i}`).classList.remove('active-no'); if(v === 'Terbiasa') document.getElementById(`hy-${i}`).classList.add('active-yes'); else document.getElementById(`hn-${i}`).classList.add('active-no');}
-      async function saveKaih(){ popup("Simpan","Mengirim...","loading"); var p={nis:LIST[IDX].nis, nama:LIST[IDX].nama_lengkap, guru:USER.nama}; for(var i=1;i<=7;i++) p["p"+i]=KAIH[i]||"-"; await requestAPI("simpanKaih", {data:p}); closePopup(); navSiswaKaih(1); }
-      function navSiswaKaih(d){ if(d===1 && IDX<LIST.length-1){IDX++; renderKaih();} else if(d===-1 && IDX>0){IDX--; renderKaih();} else if(d===1){popup("Selesai","Semua tersimpan","success"); navTo('home');} }
-      
-      async function prepRekap(){ 
-        var btn = document.getElementById("btn-back-rekap");
-        if(USER.role!=="Guru Kelas"){ 
-           document.getElementById("ks-panel").classList.remove("hide"); 
-           var l = await requestAPI("getKelas");
-           var s=document.getElementById("sel-filter-ks"); s.innerHTML="<option value='semua'>Semua Kelas</option>"; if(l)l.forEach(k=>{var o=document.createElement("option");o.text=k;s.add(o);});
-           btn.innerHTML = '<i class="material-icons-round">arrow_back</i>'; btn.onclick = function(){navTo('home')};
-        } else { 
-           document.getElementById("ks-panel").classList.add("hide"); 
-           btn.innerHTML = '<i class="material-icons-round">arrow_back</i>'; btn.onclick = function(){navTo('home')};
-        } 
-        loadDash(); 
-      }
-      function toggleDateInput(){ var m=document.getElementById("sel-mode").value; document.getElementById("inp-date").classList.add("hide"); document.getElementById("inp-month").classList.add("hide"); if(m==="bulanan") document.getElementById("inp-month").classList.remove("hide"); else if(m!=="total") document.getElementById("inp-date").classList.remove("hide"); loadDash(); }
-      
-      async function loadDash(){ 
-        var m=document.getElementById("sel-mode").value; var v=m==="bulanan"?document.getElementById("inp-month").value:document.getElementById("inp-date").value; var k=document.getElementById("sel-filter-ks").value; 
-        document.getElementById("txt-analisis").innerText="Memuat..."; 
-        var d = await requestAPI("getDashboard", {role:USER.role, userKelas:USER.kelas, mode:m, val:v, ksFilter:k});
-        if(d) {
-          DASH=d; document.getElementById("dash-header-title").innerText = d.headerLabel; 
-          document.getElementById("stat-hadir-mini").innerText = d.emoji.TotalRespon + "/" + d.totalSiswa;
-          document.getElementById("val-senang").innerText=d.emoji["Sangat Senang"]; document.getElementById("val-paham").innerText=d.emoji["Paham"];
-          document.getElementById("val-biasa").innerText=d.emoji["Biasa Saja"]; document.getElementById("val-sedih").innerText=d.emoji["Bingung/Sedih"];
-          document.getElementById("st-s").innerText=d.emoji.Sakit; document.getElementById("st-i").innerText=d.emoji.Izin; document.getElementById("st-a").innerText=d.emoji.Alpha; 
-          document.getElementById("txt-analisis").innerText = d.analisisNarasi; document.getElementById("txt-saran").innerText=d.rekomendasiGuru; 
-          var ch=""; d.kaihDetail.forEach(k=>{ var t=k.yes+k.no; var p=t===0?0:Math.round((k.yes/t)*100); ch+=`<div class="kaih-row"><div class="kaih-label"><span>${k.label}</span><span>${p}% (${k.yes}/${t})</span></div><div class="progress-bg"><div class="progress-fill" style="width:${p}%"></div></div></div>`; }); document.getElementById("chart-kaih").innerHTML=ch; 
-        }
-      }
-      function manualRefresh() { var icon = document.getElementById("icon-refresh"); icon.classList.add("spin-active"); loadDash(); setTimeout(() => { icon.classList.remove("spin-active"); }, 1000); }
-      function switchTab(tab) { CURRENT_TAB = tab; document.getElementById("tab-emoji").classList.remove("active"); document.getElementById("tab-kaih").classList.remove("active"); document.getElementById("tab-"+tab).classList.add("active"); if(tab == "emoji") { document.getElementById("panel-rekap-emoji").classList.remove("hide"); document.getElementById("panel-rekap-kaih").classList.add("hide"); } else { document.getElementById("panel-rekap-emoji").classList.add("hide"); document.getElementById("panel-rekap-kaih").classList.remove("hide"); } }
-      
-      async function checkProgress() {
-         var m=document.getElementById("sel-mode").value; if(m !== "harian") { popup("Info","Pilih mode 'Harian' untuk melihat daftar siswa.","info"); return; }
-         var tgl = document.getElementById("inp-date").value; var kls = USER.role==="Guru Kelas" ? USER.kelas : document.getElementById("sel-filter-ks").value;
-         document.getElementById("track-content").innerHTML = "Memuat data..."; document.getElementById("modal-list").classList.add("show");
-         var res = await requestAPI("getTracking", {kelas:kls, tanggal:tgl});
-         if(res){
-           var h = ""; h += `<div class="track-group"><div class="track-head cl-green"><i class="material-icons-round" style="margin-right:5px;">check</i> SUDAH INPUT <span class="track-count">${res.sudah.length}</span></div>`; if(res.sudah.length>0) res.sudah.forEach(n => h += `<div class="track-item">${n}</div>`); else h+= `<div class="track-item" style="font-style:italic">Belum ada</div>`; h += `</div>`; h += `<div class="track-group"><div class="track-head cl-red"><i class="material-icons-round" style="margin-right:5px;">close</i> BELUM INPUT <span class="track-count">${res.belum.length}</span></div>`; if(res.belum.length>0) res.belum.forEach(n => h += `<div class="track-item">${n}</div>`); else h+= `<div class="track-item" style="font-style:italic">Semua sudah input!</div>`; h += `</div>`; document.getElementById("track-content").innerHTML = h;
-         }
-      }
+        // --- APP FLOW ---
+        window.onload = () => {
+            const saved = localStorage.getItem("eksis_2026_user");
+            if (saved) { USER = JSON.parse(saved); initApp(); }
+            
+            // Set Date Inputs Default
+            const d = new Date();
+            document.getElementById('inp-date').valueAsDate = d;
+            document.getElementById('inp-month').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        };
 
-      async function prepAdmin() { 
-        var l = await requestAPI("getKelas");
-        var s=document.getElementById("sel-adm-kelas"); s.innerHTML="<option value='semua'>Semua Kelas</option>"; if(l)l.forEach(k=>{var o=document.createElement("option");o.text=k;s.add(o);}); 
-        loadAdminData('siswa'); 
-      }
-      function switchAdminTab(t) { CURR_ADM_TAB = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-adm-'+t).classList.add('active'); document.getElementById('adm-panel-siswa').classList.add('hide'); document.getElementById('adm-panel-guru').classList.add('hide'); document.getElementById('adm-panel-'+t).classList.remove("hide"); loadAdminData(t); }
-      async function loadAdminData(type) { 
-        var cont = document.getElementById("list-adm-"+type); cont.innerHTML = "Memuat..."; 
-        var filter = type === 'siswa' ? document.getElementById("sel-adm-kelas").value : ""; 
-        var list = await requestAPI("getAdmin", {type:type, filter:filter});
-        var h = ""; if(!list || list.length === 0) { h = "<div style='text-align:center; padding:20px; color:#999'>Data Kosong</div>"; } else { list.forEach(item => { var sub = item.t2 + " • " + item.t3; h += `<div class="admin-item"><div class="ai-info"><b>${item.t1}</b><span>${sub}</span></div><button class="btn-del" onclick="delAdminData('${type}', '${item.id}')"><i class="material-icons-round">delete</i></button></div>`; }); } cont.innerHTML = h; 
-      }
-      async function delAdminData(type, id) { if(confirm("Yakin hapus?")) { popup("Hapus","Proses...","loading"); await requestAPI("delAdmin", {type:type, id:id}); closePopup(); loadAdminData(type); } }
-      function openAddModal() { document.getElementById("lbl-add-type").innerText = CURR_ADM_TAB === 'siswa' ? "Siswa" : "Guru"; document.getElementById("form-siswa").classList.add("hide"); document.getElementById("form-guru").classList.add("hide"); document.getElementById("form-"+CURR_ADM_TAB).classList.remove("hide"); document.getElementById("modal-add").classList.add("show"); }
-      function closeAddModal() { document.getElementById("modal-add").classList.remove("show"); }
-      function toggleRoleInput() { var r = document.getElementById("add-g-role").value; if(r === "Guru Mapel") { document.getElementById("add-g-mapel").classList.remove("hide"); document.getElementById("add-g-kelas").placeholder="Wali Kelas (Opsional)"; } else { document.getElementById("add-g-mapel").classList.add("hide"); document.getElementById("add-g-kelas").placeholder="Wali Kelas (Contoh: 1A)";} }
-      async function saveAdminData() { 
-        var d = {}; 
-        if(CURR_ADM_TAB === 'siswa') { d.f1 = document.getElementById("add-s-nis").value; d.f2 = document.getElementById("add-s-nama").value; d.f3 = document.getElementById("add-s-panggil").value; d.f4 = document.getElementById("add-s-jk").value; d.f5 = document.getElementById("add-s-kelas").value; if(!d.f1 || !d.f2 || !d.f5) { alert("NIS, Nama, Kelas wajib!"); return; } } 
-        else { d.f1 = document.getElementById("add-g-u").value; d.f2 = document.getElementById("add-g-p").value; d.f3 = document.getElementById("add-g-nama").value; d.f4 = document.getElementById("add-g-role").value; d.f5 = document.getElementById("add-g-kelas").value; d.f6 = document.getElementById("add-g-mapel").value; if(!d.f1 || !d.f2 || !d.f3) { alert("User, Pass, Nama wajib!"); return; } } 
-        closeAddModal(); popup("Simpan","Proses...","loading"); 
-        await requestAPI("addAdmin", {type:CURR_ADM_TAB, data:d}); closePopup(); loadAdminData(CURR_ADM_TAB); 
-      }
+        async function doLogin() {
+            const u = document.getElementById('u').value;
+            const p = document.getElementById('p').value;
+            if(!u || !p) return showToast("Mohon isi lengkap", "error");
+            
+            toggleLoading(true);
+            const res = await req('login', {u, p});
+            toggleLoading(false);
+
+            if(res && res.status === 'SUKSES') {
+                USER = res;
+                localStorage.setItem("eksis_2026_user", JSON.stringify(res));
+                initApp();
+            } else {
+                showToast("Login Gagal", "error");
+            }
+        }
+
+        function doLogout() {
+            if(confirm("Keluar aplikasi?")) {
+                localStorage.removeItem("eksis_2026_user");
+                location.reload();
+            }
+        }
+
+        function initApp() {
+            document.getElementById('view-login').classList.add('hidden-view');
+            document.getElementById('view-app').classList.remove('hidden-view');
+            
+            // Set Header Info
+            const nameParts = USER.nama.split(' ');
+            document.getElementById('hdr-avatar').innerText = nameParts[0].charAt(0);
+            document.getElementById('hdr-nama').innerText = nameParts[0];
+            document.getElementById('hdr-role').innerText = USER.role;
+
+            // Role Management
+            const isAdmin = USER.role === 'KS' || USER.role === 'Admin';
+            const isGuruMapel = USER.role === 'Guru Mapel';
+
+            document.getElementById('btn-admin').classList.toggle('hidden-view', !isAdmin);
+            document.getElementById('btn-survey').classList.toggle('hidden-view', isAdmin);
+            document.getElementById('btn-kaih').classList.toggle('hidden-view', isAdmin || isGuruMapel);
+            
+            if(isAdmin) document.getElementById('nav-monitor')?.classList.remove('hidden-view');
+
+            loadRewards();
+            navTo('home');
+            lucide.createIcons();
+        }
+
+        function navTo(page) {
+            ['home', 'survey', 'kaih', 'rekap', 'admin'].forEach(p => {
+                document.getElementById(`page-${p}`).classList.add('hidden-view');
+            });
+            document.getElementById(`page-${page}`).classList.remove('hidden-view');
+            window.scrollTo(0,0);
+
+            if(page === 'survey') prepSurvey();
+            if(page === 'kaih') prepKaih();
+            if(page === 'rekap') prepRekap();
+            if(page === 'admin') prepAdmin();
+        }
+
+        async function loadRewards() {
+            const r = await req("getRewards");
+            if(r) {
+                document.getElementById('reward-area').classList.remove('hidden-view');
+                document.getElementById('rw-star-name').innerText = r.bintang.nama;
+                document.getElementById('rw-star-val').innerText = r.bintang.skor + "%";
+                document.getElementById('rw-rajin-name').innerText = r.rajin.nama;
+                document.getElementById('rw-rajin-val').innerText = r.rajin.total + " Hari";
+            }
+        }
+
+        // --- SURVEY MODULE ---
+        async function prepSurvey() {
+            if(USER.role === 'Guru Mapel') {
+                document.getElementById('survey-class-selector').classList.remove('hidden-view');
+                document.getElementById('survey-content').classList.add('hidden-view');
+                const l = await req('getKelas');
+                if(l) {
+                    const sel = document.getElementById('sel-mapel-kelas');
+                    sel.innerHTML = "";
+                    l.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+                }
+            } else {
+                document.getElementById('survey-class-selector').classList.add('hidden-view');
+                startSurvey(USER.kelas);
+            }
+        }
+
+        function startMapelSurvey() {
+            startSurvey(document.getElementById('sel-mapel-kelas').value);
+        }
+
+        async function startSurvey(kelas) {
+            document.getElementById('survey-class-selector').classList.add('hidden-view');
+            document.getElementById('survey-content').classList.remove('hidden-view');
+            toggleLoading(true);
+            const l = await req('getSiswa', {kelas});
+            toggleLoading(false);
+            
+            if(l && l.length > 0) {
+                LIST = l; IDX = 0; renderSiswa();
+            } else {
+                showToast("Data siswa kosong", "error");
+                navTo('home');
+            }
+        }
+
+        function renderSiswa() {
+            const s = LIST[IDX];
+            document.getElementById('lbl-counter').innerText = `${IDX+1} / ${LIST.length}`;
+            document.getElementById('lbl-panggil').innerText = s.panggilan;
+            document.getElementById('lbl-panggil').className = `text-3xl font-black mb-1 ${s.gender==='L'?'text-blue-600':'text-pink-500'}`;
+            document.getElementById('lbl-nama').innerText = s.nama_lengkap;
+            
+            // Reset UI
+            document.getElementById('inp-note').value = "";
+            document.getElementById('note-area').classList.add('hidden-view');
+            setAbsen('Hadir');
+        }
+
+        function setAbsen(st) {
+            ABSEN = st;
+            ['hadir','sakit','izin','alpha'].forEach(k => {
+                const btn = document.getElementById(`c-${k}`);
+                if(k === st.toLowerCase()) {
+                    btn.className = `flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all shadow-lg transform -translate-y-1 ${
+                        k==='hadir'?'bg-slate-800 text-white border-slate-800':
+                        k==='sakit'?'bg-orange-500 text-white border-orange-500':
+                        k==='izin'?'bg-blue-500 text-white border-blue-500':
+                        'bg-red-500 text-white border-red-500'
+                    }`;
+                } else {
+                    btn.className = "flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all bg-slate-50 text-slate-400 border-slate-200 hover:bg-white";
+                }
+            });
+
+            if(st === 'Hadir') {
+                document.getElementById('emoji-area').classList.remove('hidden-view');
+                document.getElementById('btn-absen-save').classList.add('hidden-view');
+            } else {
+                document.getElementById('emoji-area').classList.add('hidden-view');
+                document.getElementById('btn-absen-save').classList.remove('hidden-view');
+            }
+        }
+
+        function toggleNote() {
+            document.getElementById('note-area').classList.toggle('hidden-view');
+        }
+
+        function saveEmoji(v) {
+            playPing();
+            // Simpan data
+            const p = {
+                nis: LIST[IDX].nis, nama: LIST[IDX].nama_lengkap, 
+                kelas: LIST[IDX].kelas, mapel: USER.mapel,
+                emoji: v, ket: document.getElementById('inp-note').value, guru: USER.nama
+            };
+            req('simpanEmoji', {data: p}); // Fire and forget for speed
+            navSiswa(1);
+        }
+
+        function saveAbsen() {
+            const p = {
+                nis: LIST[IDX].nis, nama: LIST[IDX].nama_lengkap, 
+                kelas: LIST[IDX].kelas, mapel: USER.mapel,
+                emoji: ABSEN, ket: document.getElementById('inp-note').value, guru: USER.nama
+            };
+            req('simpanEmoji', {data: p});
+            navSiswa(1);
+        }
+
+        function navSiswa(dir) {
+            if(dir === 1 && IDX < LIST.length - 1) {
+                IDX++; renderSiswa();
+            } else if (dir === -1 && IDX > 0) {
+                IDX--; renderSiswa();
+            } else if (dir === 1) {
+                showToast("Survey Selesai!");
+                navTo('home');
+            }
+        }
+
+        // --- KAIH MODULE ---
+        async function prepKaih() {
+            toggleLoading(true);
+            const l = await req('getSiswa', {kelas: USER.kelas});
+            toggleLoading(false);
+            if(l && l.length > 0) {
+                LIST = l; IDX = 0; renderKaih();
+            } else {
+                showToast("Data kosong", "error"); navTo('home');
+            }
+        }
+
+        function renderKaih() {
+            document.getElementById('k-counter').innerText = `${IDX+1}/${LIST.length}`;
+            document.getElementById('k-avatar').innerText = LIST[IDX].panggilan.charAt(0);
+            document.getElementById('k-nama').innerText = LIST[IDX].nama_lengkap;
+            
+            KAIH = [null,null,null,null,null,null,null,null];
+            const habits = ["Bangun Pagi", "Beribadah", "Berolahraga", "Makan Sehat", "Gemar Belajar", "Bermasyarakat", "Tidur Cepat"];
+            const icons = ["sun", "heart", "person-standing", "utensils", "book-open", "users", "moon"];
+            
+            let html = "";
+            habits.forEach((h, i) => {
+                const id = i+1;
+                html += `
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-xs font-bold">${id}</div>
+                        <span class="text-sm font-bold text-slate-700">${h}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="khy-${id}" onclick="setK(${id},'Terbiasa')" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-300 flex items-center justify-center transition-all"><i data-lucide="check" class="w-5 h-5"></i></button>
+                        <button id="khn-${id}" onclick="setK(${id},'Belum')" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-300 flex items-center justify-center transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('kaih-list').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function setK(id, val) {
+            playPing();
+            KAIH[id] = val;
+            document.getElementById(`khy-${id}`).className = `w-9 h-9 rounded-lg border flex items-center justify-center transition-all ${val==='Terbiasa'?'bg-green-500 text-white border-green-500 shadow-md':'border-slate-200 text-slate-300'}`;
+            document.getElementById(`khn-${id}`).className = `w-9 h-9 rounded-lg border flex items-center justify-center transition-all ${val==='Belum'?'bg-red-500 text-white border-red-500 shadow-md':'border-slate-200 text-slate-300'}`;
+        }
+
+        async function saveKaih() {
+            toggleLoading(true);
+            const p = {nis: LIST[IDX].nis, nama: LIST[IDX].nama_lengkap, guru: USER.nama};
+            for(let i=1; i<=7; i++) p["p"+i] = KAIH[i] || "-";
+            await req('simpanKaih', {data: p});
+            toggleLoading(false);
+            
+            if(IDX < LIST.length - 1) {
+                IDX++; renderKaih();
+            } else {
+                showToast("Selesai!"); navTo('home');
+            }
+        }
+
+        // --- REKAP & DASHBOARD ---
+        async function prepRekap() {
+            if(USER.role !== 'Guru Kelas') {
+                document.getElementById('ks-filter-area').classList.remove('hidden-view');
+                const l = await req('getKelas');
+                const sel = document.getElementById('sel-filter-ks');
+                sel.innerHTML = "<option value='semua'>Semua Kelas</option>";
+                if(l) l.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+            } else {
+                document.getElementById('ks-filter-area').classList.add('hidden-view');
+            }
+            loadDash();
+        }
+
+        function toggleDateInput() {
+            const m = document.getElementById('sel-mode').value;
+            if(m === 'bulanan') {
+                document.getElementById('inp-date').classList.add('hidden-view');
+                document.getElementById('inp-month').classList.remove('hidden-view');
+            } else {
+                document.getElementById('inp-date').classList.remove('hidden-view');
+                document.getElementById('inp-month').classList.add('hidden-view');
+            }
+            if(m !== 'total') loadDash();
+        }
+
+        async function loadDash() {
+            const m = document.getElementById('sel-mode').value;
+            const v = m==='bulanan' ? document.getElementById('inp-month').value : document.getElementById('inp-date').value;
+            const k = document.getElementById('sel-filter-ks').value;
+
+            document.getElementById('dash-title').innerText = "Memuat data...";
+            const d = await req('getDashboard', {role: USER.role, userKelas: USER.kelas, mode: m, val: v, ksFilter: k});
+            
+            if(d) {
+                document.getElementById('dash-title').innerText = d.headerLabel;
+                // Emoji Stats
+                document.getElementById('val-senang').innerText = d.emoji["Sangat Senang"];
+                document.getElementById('val-paham').innerText = d.emoji["Paham"];
+                document.getElementById('val-biasa').innerText = d.emoji["Biasa Saja"];
+                document.getElementById('val-sedih').innerText = d.emoji["Bingung/Sedih"];
+                document.getElementById('st-s').innerText = d.emoji.Sakit;
+                document.getElementById('st-i').innerText = d.emoji.Izin;
+                document.getElementById('st-a').innerText = d.emoji.Alpha;
+                
+                // Text
+                document.getElementById('txt-analisis').innerText = d.analisisNarasi || "Belum ada data yang cukup.";
+                document.getElementById('txt-saran').innerText = d.rekomendasiGuru || "-";
+
+                // KAIH Chart (Simple HTML Bar)
+                let html = "";
+                d.kaihDetail.forEach(x => {
+                    const total = x.yes + x.no;
+                    const pct = total === 0 ? 0 : Math.round((x.yes/total)*100);
+                    html += `
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                            <span>${x.label}</span>
+                            <span>${pct}%</span>
+                        </div>
+                        <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 rounded-full" style="width:${pct}%"></div>
+                        </div>
+                    </div>`;
+                });
+                document.getElementById('chart-kaih').innerHTML = html;
+            }
+        }
+
+        function switchTab(t) {
+            CURRENT_TAB = t;
+            document.getElementById('tab-emoji').className = t==='emoji' ? "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-white shadow-md" : "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-600";
+            document.getElementById('tab-kaih').className = t==='kaih' ? "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-white shadow-md" : "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-600";
+            
+            document.getElementById('panel-emoji').classList.toggle('hidden-view', t !== 'emoji');
+            document.getElementById('panel-kaih').classList.toggle('hidden-view', t !== 'kaih');
+        }
+
+        async function checkProgress() {
+            if(document.getElementById('sel-mode').value !== 'harian') return showToast("Pilih mode Harian dulu", "error");
+            
+            toggleLoading(true);
+            const k = USER.role === 'Guru Kelas' ? USER.kelas : document.getElementById('sel-filter-ks').value;
+            const t = document.getElementById('inp-date').value;
+            const res = await req('getTracking', {kelas: k, tanggal: t});
+            toggleLoading(false);
+
+            if(res) {
+                let h = `<div class="mb-4"><h4 class="text-xs font-bold text-green-600 uppercase mb-2">Sudah Input (${res.sudah.length})</h4>`;
+                if(res.sudah.length) res.sudah.forEach(n => h += `<div class="text-xs py-1 px-2 border-b border-slate-50 text-slate-600">${n}</div>`);
+                else h += `<div class="text-xs italic text-slate-300">Kosong</div>`;
+                h += `</div><div><h4 class="text-xs font-bold text-red-500 uppercase mb-2">Belum Input (${res.belum.length})</h4>`;
+                if(res.belum.length) res.belum.forEach(n => h += `<div class="text-xs py-1 px-2 border-b border-slate-50 text-slate-600">${n}</div>`);
+                else h += `<div class="text-xs italic text-slate-300">Semua sudah!</div>`;
+                h += `</div>`;
+                
+                document.getElementById('track-content').innerHTML = h;
+                document.getElementById('modal-list').classList.remove('hidden-view');
+            }
+        }
+
+        // --- ADMIN ---
+        async function prepAdmin() {
+            const l = await req('getKelas');
+            const s = document.getElementById('sel-adm-kelas');
+            s.innerHTML = "<option value='semua'>Semua Kelas</option>";
+            if(l) l.forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+            loadAdminData('siswa');
+        }
+
+        function switchAdminTab(t) {
+            ADM_TAB = t;
+            document.getElementById('adm-tab-siswa').className = t==='siswa' ? "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-white shadow-md" : "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-600";
+            document.getElementById('adm-tab-guru').className = t==='guru' ? "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-800 text-white shadow-md" : "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-600";
+            
+            document.getElementById('adm-content-siswa').classList.toggle('hidden-view', t !== 'siswa');
+            document.getElementById('adm-content-guru').classList.toggle('hidden-view', t !== 'guru');
+            loadAdminData(t);
+        }
+
+        async function loadAdminData(type) {
+            const cont = document.getElementById(`list-adm-${type}`);
+            cont.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">Memuat...</div>`;
+            
+            const filter = type === 'siswa' ? document.getElementById('sel-adm-kelas').value : "";
+            const res = await req('getAdmin', {type, filter});
+            
+            if(res && res.length > 0) {
+                let h = "";
+                res.forEach(item => {
+                    const sub = item.t2 + " • " + item.t3;
+                    h += `
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">${item.t1}</h4>
+                            <p class="text-xs text-slate-400 font-medium">${sub}</p>
+                        </div>
+                        <button onclick="delAdminData('${type}', '${item.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
+                });
+                cont.innerHTML = h;
+                lucide.createIcons();
+            } else {
+                cont.innerHTML = `<div class="text-center py-10 text-slate-300 italic text-xs">Data kosong</div>`;
+            }
+        }
+
+        async function delAdminData(type, id) {
+            if(confirm("Hapus data ini?")) {
+                toggleLoading(true);
+                await req('delAdmin', {type, id});
+                toggleLoading(false);
+                loadAdminData(type);
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('lbl-add-type').innerText = ADM_TAB === 'siswa' ? 'Siswa' : 'Guru';
+            document.getElementById('form-siswa').classList.toggle('hidden-view', ADM_TAB !== 'siswa');
+            document.getElementById('form-guru').classList.toggle('hidden-view', ADM_TAB !== 'guru');
+            document.getElementById('modal-add').classList.remove('hidden-view');
+        }
+
+        function toggleRoleInput() {
+            const r = document.getElementById('add-g-role').value;
+            if(r === 'Guru Mapel') {
+                document.getElementById('add-g-mapel').classList.remove('hidden-view');
+                document.getElementById('add-g-kelas').placeholder = "Wali Kelas (Opsional)";
+            } else {
+                document.getElementById('add-g-mapel').classList.add('hidden-view');
+                document.getElementById('add-g-kelas').placeholder = "Wali Kelas (Contoh: 1A)";
+            }
+        }
+
+        async function saveAdminData() {
+            const d = {};
+            if(ADM_TAB === 'siswa') {
+                d.f1 = document.getElementById('add-s-nis').value;
+                d.f2 = document.getElementById('add-s-nama').value;
+                d.f3 = document.getElementById('add-s-panggil').value;
+                d.f4 = document.getElementById('add-s-jk').value;
+                d.f5 = document.getElementById('add-s-kelas').value;
+                if(!d.f1 || !d.f2 || !d.f5) return showToast("Data kurang lengkap", "error");
+            } else {
+                d.f1 = document.getElementById('add-g-u').value;
+                d.f2 = document.getElementById('add-g-p').value;
+                d.f3 = document.getElementById('add-g-nama').value;
+                d.f4 = document.getElementById('add-g-role').value;
+                d.f5 = document.getElementById('add-g-kelas').value;
+                d.f6 = document.getElementById('add-g-mapel').value;
+                if(!d.f1 || !d.f2 || !d.f3) return showToast("Data kurang lengkap", "error");
+            }
+
+            document.getElementById('modal-add').classList.add('hidden-view');
+            toggleLoading(true);
+            await req('addAdmin', {type: ADM_TAB, data: d});
+            toggleLoading(false);
+            loadAdminData(ADM_TAB);
+            showToast("Berhasil disimpan");
+        }
+
     </script>
-  </body>
+</body>
 </html>
