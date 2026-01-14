@@ -31,7 +31,38 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body { background-color: #fdfbf7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        /* --- LAYOUT UTAMA (MOBILE SHELL) --- */
+        body { 
+            background-color: #e2e8f0; /* Latar belakang abu-abu untuk Desktop */
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none; 
+            overflow-x: hidden;
+            overscroll-behavior-y: none; /* Mencegah efek mental/bounce */
+            touch-action: pan-x pan-y;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container Aplikasi - Memaksa tampilan HP di tengah layar */
+        #view-login, #view-app {
+            max-width: 480px; /* Lebar maksimal HP */
+            margin: 0 auto;   /* Posisi tengah */
+            min-height: 100vh;
+            min-height: 100dvh; /* Support viewport dinamis mobile */
+            background-color: #fdfbf7; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.15); /* Bayangan agar timbul */
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Khusus HP beneran: hilangkan bayangan & margin agar full screen */
+        @media (max-width: 480px) {
+            body { background-color: #fdfbf7; }
+            #view-login, #view-app { box-shadow: none; margin: 0; max-width: 100%; }
+        }
+
+        /* UTILS */
         .hidden-view { display: none !important; }
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -85,9 +116,9 @@
         <div id="loading-text" class="mt-4 text-xs font-bold text-slate-400 tracking-widest uppercase">MEMUAT...</div>
     </div>
 
-    <div id="toast-container" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-3 w-full max-w-xs pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-3 w-full max-w-[320px] pointer-events-none"></div>
 
-    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6 bg-[#FF9000] relative overflow-hidden">
+    <div id="view-login" class="flex flex-col items-center justify-center p-6 bg-[#FF9000] relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-[#FF9000] via-[#FF6B00] to-[#E65100]"></div>
         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
         
@@ -108,7 +139,7 @@
         </div>
     </div>
 
-    <div id="view-app" class="hidden-view max-w-md mx-auto min-h-screen bg-[#fdfbf7] relative shadow-2xl pb-24">
+    <div id="view-app" class="hidden-view bg-[#fdfbf7] pb-24">
         
         <div class="sticky top-0 z-30 bg-[#fdfbf7]/95 backdrop-blur-sm px-6 pt-8 pb-4 flex justify-between items-center border-b border-slate-100">
             <div class="flex items-center gap-4">
@@ -256,7 +287,7 @@
 
                 <div id="kaih-render" class="space-y-3 pb-48"></div>
 
-                <div class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-slate-200 p-4 z-40 pb-6 rounded-t-[1.5rem] shadow-[0_-5px_25px_rgba(0,0,0,0.05)]">
+                <div class="fixed bottom-0 max-w-[480px] w-full bg-white/90 backdrop-blur-md border-t border-slate-200 p-4 z-40 pb-6 rounded-t-[1.5rem] shadow-[0_-5px_25px_rgba(0,0,0,0.05)]">
                     <div class="max-w-md mx-auto">
                         <button onclick="saveKaih()" class="w-full py-4 bg-gradient-to-r from-primary to-primaryDark text-white rounded-2xl font-bold shadow-lg shadow-orange-200 active:scale-95 transition flex items-center justify-center gap-2 mb-3">
                             <i data-lucide="check-circle" class="w-5 h-5"></i> SIMPAN & LANJUT
@@ -346,7 +377,7 @@
                     <div id="list-adm-guru" class="space-y-2 pb-20"></div>
                 </div>
 
-                <button onclick="openAddModal()" class="fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg shadow-orange-200 flex items-center justify-center hover:scale-105 active:scale-90 transition z-40">
+                <button onclick="openAddModal()" class="fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg shadow-orange-200 flex items-center justify-center hover:scale-105 active:scale-90 transition z-40 transform translate-x-[-50%] ml-[50%] lg:translate-x-0 lg:ml-0" style="right: calc(50% - 220px);">
                     <i data-lucide="plus" class="w-8 h-8"></i>
                 </button>
             </div>
@@ -354,7 +385,7 @@
         </div>
     </div>
 
-    <div id="modal-add" class="hidden-view fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5 backdrop-blur-sm">
+    <div id="modal-add" class="hidden-view fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-5 backdrop-blur-sm">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <h3 class="text-xl font-bold text-slate-800 mb-1">Tambah <span id="lbl-add-type">Data</span></h3>
             
@@ -383,7 +414,7 @@
         </div>
     </div>
 
-    <div id="modal-list" class="hidden-view fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5 backdrop-blur-sm">
+    <div id="modal-list" class="hidden-view fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-5 backdrop-blur-sm">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="list-checks" class="w-5 h-5 text-primary"></i> Status Input</h3>
             <div id="track-content" class="overflow-y-auto flex-1 space-y-4 pr-2"></div>
@@ -846,6 +877,38 @@
         loadAdminData(CURR_ADM_TAB); 
         popup("Selesai","Berhasil disimpan","success");
       }
+    </script>
+    
+    <script>
+        // Mematikan Double Tap Zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Mematikan Pinch to Zoom (Cubit)
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+
+        // Mencegah scroll pada body utama (kecuali di dalam container app)
+        // Ini membuat aplikasi terasa "terkunci" di tempatnya
+        document.body.addEventListener('touchmove', function(e) {
+            if (!e.target.closest('.overflow-y-auto') && !e.target.closest('input')) {
+               // Opsional: aktifkan jika ingin mematikan scroll background total
+               // e.preventDefault(); 
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
