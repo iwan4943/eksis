@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EKSIS Parents - Portal Wali Murid</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF9000', 
+                        primaryDark: '#e65100',
+                        secondary: '#334155',
+                        surface: '#fdfbf7',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 10px 30px -10px rgba(0,0,0,0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* LAYOUT UTAMA (MOBILE SHELL) */
+        body { 
+            background-color: #e2e8f0; 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none; 
+            overflow-x: hidden;
+            overscroll-behavior-y: none; 
+            touch-action: pan-x pan-y;
+            margin: 0;
+        }
+
+        #view-login, #view-app {
+            max-width: 480px; 
+            margin: 0 auto;   
+            min-height: 100vh;
+            min-height: 100dvh; 
+            background-color: #fdfbf7; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.15); 
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @media (max-width: 480px) {
+            body { background-color: #fdfbf7; }
+            #view-login, #view-app { box-shadow: none; margin: 0; max-width: 100%; }
+        }
+
+        .hidden-view { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Loading & Toast Animation */
+        .loader-dots div { animation-timing-function: cubic-bezier(0, 1, 1, 0); }
+        .loader-dots div:nth-child(1) { left: 8px; animation: loader-dots1 0.6s infinite; }
+        .loader-dots div:nth-child(2) { left: 8px; animation: loader-dots2 0.6s infinite; }
+        .loader-dots div:nth-child(3) { left: 32px; animation: loader-dots2 0.6s infinite; }
+        .loader-dots div:nth-child(4) { left: 56px; animation: loader-dots3 0.6s infinite; }
+        @keyframes loader-dots1 { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        @keyframes loader-dots3 { 0% { transform: scale(1); } 100% { transform: scale(0); } }
+        @keyframes loader-dots2 { 0% { transform: translate(0, 0); } 100% { transform: translate(24px, 0); } }
+
+        @keyframes slideInDown { 0% { opacity: 0; transform: translateY(-20px) scale(0.95); } 60% { transform: translateY(5px) scale(1.02); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes slideOutUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+        .toast-enter { animation: slideInDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .toast-exit { animation: slideOutUp 0.3s ease-in forwards; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen relative">
+
+    <div id="loading-overlay" class="hidden-view fixed inset-0 bg-white/90 z-[100] flex items-center justify-center backdrop-blur-sm flex-col">
+        <div class="loader-dots relative w-20 h-5">
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+            <div class="absolute top-0 w-3 h-3 rounded-full bg-primary"></div>
+        </div>
+        <div id="loading-text" class="mt-4 text-xs font-bold text-slate-400 tracking-widest uppercase">MEMUAT...</div>
+    </div>
+
+    <div id="toast-container" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-3 w-full max-w-[320px] pointer-events-none"></div>
+
+    <!-- VIEW LOGIN (KHUSUS ORANG TUA) -->
+    <div id="view-login" class="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        
+        <div class="w-full max-w-sm flex flex-col items-center z-10 relative fade-in">
+            <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-3xl p-4 mb-4 shadow-2xl flex items-center justify-center rotate-3 border border-white/20">
+                <i data-lucide="home" class="text-white w-10 h-10"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold text-white mb-1 tracking-tight">EKSIS PARENTS</h1>
+            <p class="text-blue-200 text-[10px] mb-10 tracking-[0.2em] uppercase font-bold bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm">Portal Wali Murid</p>
+            
+            <div class="w-full space-y-4 bg-white/10 backdrop-blur-xl p-6 rounded-[2rem] border border-white/20 shadow-xl">
+                <div>
+                    <label class="text-[10px] font-bold text-blue-100 uppercase tracking-wider ml-2 mb-1 block">NIS Siswa</label>
+                    <input type="number" id="l-nis" class="w-full px-5 py-4 bg-white/90 rounded-2xl border-0 text-slate-800 font-bold placeholder-slate-400 focus:ring-2 focus:ring-blue-300 transition-all shadow-inner outline-none" placeholder="Masukkan NIS">
+                </div>
+                
+                <div>
+                    <label class="text-[10px] font-bold text-blue-100 uppercase tracking-wider ml-2 mb-1 block">Password</label>
+                    <div class="relative">
+                        <input type="password" id="l-pass" class="w-full px-5 py-4 bg-white/90 rounded-2xl border-0 text-slate-800 font-bold placeholder-slate-400 focus:ring-2 focus:ring-blue-300 transition-all shadow-inner outline-none pr-12" placeholder="Default: NIS Siswa">
+                        <button onclick="togglePassword()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 active:scale-90 transition">
+                            <i id="icon-eye" data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-[9px] text-blue-200 mt-2 ml-2 italic">*Gunakan NIS siswa sebagai password jika belum diganti.</p>
+                </div>
+
+                <button onclick="doLogin()" class="w-full py-4 bg-primary text-white rounded-2xl font-extrabold text-lg shadow-lg hover:bg-orange-500 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2">
+                    MASUK <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <p class="mt-8 text-[10px] text-white/50 font-medium">&copy; 2026 EKSIS System</p>
+        </div>
+    </div>
+
+    <!-- VIEW APP UTAMA -->
+    <div id="view-app" class="hidden-view bg-[#fdfbf7] pb-24">
+        
+        <div class="sticky top-0 z-30 bg-[#fdfbf7]/95 backdrop-blur-sm px-6 pt-8 pb-4 flex justify-between items-center border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 flex items-center justify-center font-bold text-xl border border-blue-300 shadow-sm">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Wali Murid Dari</p>
+                    <h2 class="text-lg font-extrabold text-slate-800 leading-none truncate w-48" id="hdr-nama-anak">...</h2>
+                </div>
+            </div>
+            <button onclick="navTo('pengaturan')" class="w-10 h-10 rounded-full bg-white text-slate-400 border border-slate-200 flex items-center justify-center hover:bg-slate-50 active:scale-90 transition shadow-sm">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div id="content-area" class="px-5 py-6 space-y-5">
+            
+            <!-- HALAMAN BERANDA (DASHBOARD) -->
+            <div id="page-home" class="page-section fade-in">
+                
+                <!-- MAGNET FEATURE: LAPOR ABSEN -->
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-5 rounded-[2rem] shadow-lg shadow-blue-200 text-white relative overflow-hidden mb-6">
+                    <div class="absolute right-[-20px] top-[-20px] opacity-10"><i data-lucide="calendar-clock" class="w-40 h-40"></i></div>
+                    <h3 class="font-bold text-lg mb-1 relative z-10">Lapor Absensi</h3>
+                    <p class="text-blue-200 text-xs mb-4 relative z-10 w-3/4">Beritahu guru jika ananda berhalangan hadir hari ini.</p>
+                    <button onclick="navTo('lapor')" class="w-full py-3 bg-white text-blue-700 rounded-xl font-bold shadow-sm active:scale-95 transition-all text-sm flex items-center justify-center gap-2 relative z-10">
+                        <i data-lucide="send" class="w-4 h-4"></i> BUAT LAPORAN BARU
+                    </button>
+                </div>
+
+                <!-- STATUS HARI INI -->
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <i data-lucide="activity" class="w-4 h-4 text-primary"></i>
+                    <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Status Hari Ini di Sekolah</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card flex flex-col items-center text-center">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Kehadiran</span>
+                        <div id="stat-hadir-bg" class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-2">
+                            <i id="stat-hadir-icon" data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </div>
+                        <span id="stat-hadir-teks" class="font-bold text-slate-800 text-sm">Hadir</span>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-card flex flex-col items-center text-center">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Mood Anak</span>
+                        <div class="text-4xl mb-2 drop-shadow-sm" id="stat-emoji">🤩</div>
+                        <span id="stat-emoji-teks" class="font-bold text-slate-800 text-sm">Sangat Senang</span>
+                    </div>
+                </div>
+
+                <!-- VALIDASI KAIH (MUNCUL AKTIF DI AKHIR PEKAN) -->
+                <div class="flex items-center gap-2 mb-3 px-1 mt-2">
+                    <i data-lucide="list-checks" class="w-4 h-4 text-primary"></i>
+                    <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Validasi Karakter (KAIH)</span>
+                </div>
+                
+                <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-card">
+                    <p class="text-xs text-slate-500 font-medium mb-4 leading-relaxed">Bantu sekolah memantau 7 kebiasaan anak di rumah minggu ini.</p>
+                    
+                    <div id="kaih-list" class="space-y-3 mb-5">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <button onclick="simpanKAIH()" class="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-orange-200 active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="save" class="w-4 h-4"></i> SIMPAN VALIDASI MINGGU INI
+                    </button>
+                </div>
+            </div>
+
+            <!-- HALAMAN LAPOR ABSEN -->
+            <div id="page-lapor" class="page-section hidden-view fade-in">
+                <button onclick="navTo('home')" class="w-10 h-10 mb-4 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-90 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                
+                <h2 class="text-2xl font-bold text-slate-800 mb-1">Lapor Ketidakhadiran</h2>
+                <p class="text-sm text-slate-500 mb-6">Laporan akan langsung diterima oleh Wali Kelas.</p>
+
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-card space-y-5">
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 block">Alasan</label>
+                        <div class="flex gap-3">
+                            <button onclick="pilihAbsenOrtu('Sakit')" id="btn-sakit" class="flex-1 py-3 rounded-xl font-bold border transition-all bg-white text-slate-400 border-slate-200 flex items-center justify-center gap-2">
+                                <i data-lucide="thermometer" class="w-4 h-4"></i> Sakit
+                            </button>
+                            <button onclick="pilihAbsenOrtu('Izin')" id="btn-izin" class="flex-1 py-3 rounded-xl font-bold border transition-all bg-white text-slate-400 border-slate-200 flex items-center justify-center gap-2">
+                                <i data-lucide="mail" class="w-4 h-4"></i> Izin
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 block">Keterangan Tambahan</label>
+                        <textarea id="inp-keterangan" rows="3" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-primary focus:bg-white outline-none shadow-inner" placeholder="Misal: Demam sejak semalam / Acara keluarga ke luar kota..."></textarea>
+                    </div>
+
+                    <button onclick="kirimLaporan()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="send" class="w-5 h-5"></i> KIRIM LAPORAN
+                    </button>
+                </div>
+            </div>
+
+            <!-- HALAMAN PENGATURAN -->
+            <div id="page-pengaturan" class="page-section hidden-view fade-in">
+                <button onclick="navTo('home')" class="w-10 h-10 mb-4 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-90 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Pengaturan Akun</h2>
+
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-card space-y-5 mb-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="lock" class="w-4 h-4 text-primary"></i>
+                        <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Ganti Password</span>
+                    </div>
+                    
+                    <input type="password" id="cp-lama" class="w-full p-4 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Password Lama (Atau NIS)">
+                    <input type="password" id="cp-baru" class="w-full p-4 bg-slate-50 rounded-xl text-sm border border-slate-200 font-bold outline-none focus:border-primary" placeholder="Password Baru">
+                    
+                    <button onclick="gantiPassword()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold active:scale-95 transition-all text-sm">
+                        Simpan Password Baru
+                    </button>
+                </div>
+
+                <button onclick="doLogout()" class="w-full py-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl font-bold active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="log-out" class="w-5 h-5"></i> KELUAR APLIKASI
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi URL API Google Apps Script Asli
+        const API_URL = "https://script.google.com/macros/s/AKfycbw0uCEkQec7b_ZU_cakKU1yHDyKrhEhOYyrUxa6baewPsWGkVZDV5b6nQFxOqu0ziOe/exec"; 
+        
+        let ORTU_SESSION = {};
+        let STATUS_ABSEN_LAPOR = "Sakit";
+        let KAIH_DATA = ["Terbiasa","Terbiasa","Terbiasa","Terbiasa","Terbiasa","Terbiasa","Terbiasa"];
+        const HABITS = ["Bangun Pagi", "Beribadah", "Berolahraga", "Makan Sehat", "Gemar Belajar", "Bermasyarakat", "Tidur Cepat"];
+
+        // UI Utils
+        const popup = (title, message, type) => {
+            const loader = document.getElementById('loading-overlay');
+            if(type === 'loading') {
+                document.getElementById('loading-text').innerText = message || "MEMUAT...";
+                loader.classList.remove('hidden-view');
+                return;
+            } else { loader.classList.add('hidden-view'); }
+
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            let bgClass = 'bg-white', borderClass = '', iconClass = '', iconName = '';
+            
+            if (type === 'error') { borderClass = 'border-l-4 border-l-red-500'; iconClass = 'text-red-500 bg-red-50'; iconName = 'alert-triangle'; } 
+            else if (type === 'success') { borderClass = 'border-l-4 border-l-green-500'; iconClass = 'text-green-600 bg-green-50'; iconName = 'check-circle-2'; } 
+            else { borderClass = 'border-l-4 border-l-blue-500'; iconClass = 'text-blue-500 bg-blue-50'; iconName = 'info'; }
+
+            el.className = `pointer-events-auto relative overflow-hidden w-full p-4 rounded-xl shadow-2xl shadow-slate-200/50 flex items-start gap-3 toast-enter ${bgClass} ${borderClass}`;
+            el.innerHTML = `<div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${iconClass}"><i data-lucide="${iconName}" class="w-5 h-5"></i></div>
+                <div class="flex-1 min-w-0"><h4 class="text-sm font-extrabold text-slate-800 leading-tight mb-0.5">${title}</h4><p class="text-xs font-medium text-slate-500 leading-snug">${message}</p></div>`;
+            container.appendChild(el); lucide.createIcons();
+            setTimeout(() => { el.classList.remove('toast-enter'); el.classList.add('toast-exit'); setTimeout(()=>el.remove(),300); }, 3500);
+        };
+        const closePopup = () => document.getElementById('loading-overlay').classList.add('hidden-view');
+
+        // API Fetcher Terkoneksi Langsung ke Google Apps Script
+        async function requestAPI(action, payload = {}) {
+            payload.action = action;
+            payload.source = "ortu_app"; // Identifier untuk GAS
+            try {
+                // Mengirim request ke URL GAS 
+                const response = await fetch(API_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify(payload) 
+                });
+                return await response.json();
+            } catch (error) { 
+                console.error("API Error:", error);
+                popup("Koneksi", "Gagal terhubung server", "error"); 
+                return null; 
+            }
+        }
+
+        // Init App
+        window.onload = function() {
+            var saved = localStorage.getItem("eksis_ortu_2026"); 
+            if(saved) { ORTU_SESSION = JSON.parse(saved); initDashboard(); } 
+            lucide.createIcons();
+            renderKaihUI();
+        };
+
+        // Fitur Tampil/Sembunyi Password
+        function togglePassword() {
+            const input = document.getElementById('l-pass');
+            const icon = document.getElementById('icon-eye');
+            if (input.type === 'password') { input.type = 'text'; icon.setAttribute('data-lucide', 'eye-off'); } 
+            else { input.type = 'password'; icon.setAttribute('data-lucide', 'eye'); }
+            lucide.createIcons();
+        }
+
+        async function doLogin() {
+            var nis = document.getElementById("l-nis").value;
+            var pass = document.getElementById("l-pass").value;
+            if(!nis || !pass) { popup("Maaf", "NIS dan Password wajib diisi", "error"); return; }
+            
+            popup("Loading", "Masuk sistem...", "loading");
+            var res = await requestAPI("login_ortu", {nis: nis, pass: pass});
+            
+            if(res && res.status === "SUKSES") {
+                ORTU_SESSION = res;
+                localStorage.setItem("eksis_ortu_2026", JSON.stringify(res));
+                closePopup(); initDashboard();
+            } else {
+                closePopup(); popup("Gagal", res.msg || "Cek kembali NIS & Password", "error");
+            }
+        }
+
+        function initDashboard() {
+            document.getElementById("view-login").classList.add("hidden-view");
+            document.getElementById("view-app").classList.remove("hidden-view");
+            document.getElementById("hdr-nama-anak").innerText = ORTU_SESSION.nama_anak;
+            navTo('home');
+            
+            // Note: Status hari ini (Kehadiran & Mood) sementara statis. 
+            // Jika ingin dihubungkan dengan data harian anak secara real-time, 
+            // bisa dibuatkan function `getDataAnak` di Google Apps Script nantinya.
+            document.getElementById("stat-hadir-teks").innerText = "Hadir";
+            document.getElementById("stat-emoji").innerText = "🤩";
+            document.getElementById("stat-emoji-teks").innerText = "Sangat Senang";
+        }
+
+        function doLogout() {
+            localStorage.removeItem("eksis_ortu_2026");
+            location.reload();
+        }
+
+        function navTo(page) {
+            document.querySelectorAll('.page-section').forEach(e => e.classList.add('hidden-view'));
+            document.getElementById('page-' + page).classList.remove('hidden-view');
+            window.scrollTo(0,0);
+        }
+
+        function pilihAbsenOrtu(st) {
+            STATUS_ABSEN_LAPOR = st;
+            document.getElementById('btn-sakit').className = "flex-1 py-3 rounded-xl font-bold border transition-all bg-white text-slate-400 border-slate-200 flex items-center justify-center gap-2";
+            document.getElementById('btn-izin').className = "flex-1 py-3 rounded-xl font-bold border transition-all bg-white text-slate-400 border-slate-200 flex items-center justify-center gap-2";
+            
+            if(st === 'Sakit') document.getElementById('btn-sakit').className = "flex-1 py-3 rounded-xl font-bold border transition-all bg-orange-50 text-orange-600 border-orange-500 shadow-md transform -translate-y-1 flex items-center justify-center gap-2";
+            else document.getElementById('btn-izin').className = "flex-1 py-3 rounded-xl font-bold border transition-all bg-blue-50 text-blue-600 border-blue-500 shadow-md transform -translate-y-1 flex items-center justify-center gap-2";
+        }
+        
+        pilihAbsenOrtu('Sakit'); // Default
+
+        async function kirimLaporan() {
+            var ket = document.getElementById("inp-keterangan").value;
+            popup("Loading", "Mengirim laporan...", "loading");
+            var res = await requestAPI("ortu_lapor_absen", { nis: ORTU_SESSION.nis, status: STATUS_ABSEN_LAPOR, keterangan: ket });
+            closePopup();
+            
+            if(res && res.status === "SUKSES") {
+                popup("Terkirim", "Laporan berhasil diterima Wali Kelas.", "success");
+                navTo('home');
+                document.getElementById("inp-keterangan").value = "";
+            } else {
+                popup("Gagal", "Gagal mengirim laporan.", "error");
+            }
+        }
+
+        function renderKaihUI() {
+            let html = "";
+            HABITS.forEach((h, i) => {
+                html += `
+                <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                    <span class="text-sm font-bold text-slate-700">${h}</span>
+                    <button id="btn-kaih-${i}" onclick="toggleKaih(${i})" class="px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-green-100 text-green-700 border border-green-200">
+                        <i data-lucide="check" class="w-3 h-3 inline mr-1"></i> Terbiasa
+                    </button>
+                </div>`;
+            });
+            document.getElementById("kaih-list").innerHTML = html;
+        }
+
+        function toggleKaih(idx) {
+            const btn = document.getElementById(`btn-kaih-${idx}`);
+            if(KAIH_DATA[idx] === "Terbiasa") {
+                KAIH_DATA[idx] = "Belum";
+                btn.className = "px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-slate-100 text-slate-500 border border-slate-200";
+                btn.innerHTML = `<i data-lucide="x" class="w-3 h-3 inline mr-1"></i> Belum`;
+            } else {
+                KAIH_DATA[idx] = "Terbiasa";
+                btn.className = "px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-green-100 text-green-700 border border-green-200";
+                btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 inline mr-1"></i> Terbiasa`;
+            }
+            lucide.createIcons();
+        }
+
+        async function simpanKAIH() {
+            popup("Loading", "Menyimpan validasi...", "loading");
+            var p = { nis: ORTU_SESSION.nis };
+            for(let i=0; i<7; i++) p["p"+(i+1)] = KAIH_DATA[i];
+            var res = await requestAPI("ortu_simpan_kaih", p);
+            closePopup();
+            
+            if(res && res.status === "SUKSES") {
+                popup("Selesai", "Terima kasih atas kolaborasinya Ayah/Bunda!", "success");
+            } else {
+                popup("Gagal", "Gagal menyimpan validasi KAIH.", "error");
+            }
+        }
+
+        async function gantiPassword() {
+            var lama = document.getElementById("cp-lama").value;
+            var baru = document.getElementById("cp-baru").value;
+            if(!lama || !baru) { popup("Maaf", "Isi kedua kolom password", "error"); return; }
+            popup("Loading", "Menyimpan password...", "loading");
+            var res = await requestAPI("ortu_ganti_pass", {nis: ORTU_SESSION.nis, lama: lama, baru: baru});
+            closePopup();
+            
+            if(res && res.status === "SUKSES") {
+                popup("Berhasil", "Password telah diperbarui.", "success");
+                document.getElementById("cp-lama").value = "";
+                document.getElementById("cp-baru").value = "";
+            } else {
+                popup("Gagal", res.msg || "Gagal mengubah password.", "error");
+            }
+        }
+    </script>
+    
+    <!-- ANTI ZOOM SCRIPT -->
+    <script>
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (e) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, false);
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        document.addEventListener('gesturechange', e => e.preventDefault());
+        document.addEventListener('gestureend', e => e.preventDefault());
+        document.body.addEventListener('touchmove', function(e) {
+            if (!e.target.closest('.overflow-x-hidden') && !e.target.closest('input') && !e.target.closest('textarea')) {
+                // Ignore
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
